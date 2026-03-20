@@ -267,7 +267,7 @@ Every worker gets a Risk Score when they register:
 1. Bharti Pathak — Research
 2. Supriya Verma — Documentation
 3. Sanjoli Singh — Video Production
-4. Nandini Kumari — Project Management
+4. Nandini — Project Management
 
 ---
 
