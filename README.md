@@ -257,18 +257,18 @@ Every worker gets a Risk Score when they register:
 
 ## 👥 Team — HackHer Squad
 
-- **Team Name:** HackHer Squad
+- **Team Name:**  The HackHer Squad
 - **Hackathon:** Guidewire DEVTrails 2026
 - **University:** AKTU (Dr. A.P.J. Abdul Kalam Technical University)
-- **City:** Delhi
+- **City:** Noida
 - **Platform:** Web Application
 
 ### Team Members:
 1. Bharti Pathak — Research
 2. Supriya Verma — Documentation
 3. Sanjoli Singh — Video Production
-4. Nandini Verma — Project Management
+4. Nandini Kumari — Project Management
 
 ---
 
-*Built with ❤️ for Delhi's gig economy workers by HackHer Squad*
+*Built in India by The HackHer Squad*
