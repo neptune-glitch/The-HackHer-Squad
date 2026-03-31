@@ -1,25 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login - GigShield</title>
+  <title>Login - GigShield</title>
+  <link rel="stylesheet" href="/static/loginstyle.css">
 </head>
 <body>
-    <h1>🛡️ GigShield Login</h1>
-    
-    <form method="POST" action="/login">
-        <input type="text" name="phone" 
-               placeholder="Phone Number" required>
-        <br><br>
-        
-        <input type="password" name="password" 
-               placeholder="Password" required>
-        <br><br>
-        
-        <button type="submit">Login</button>
-    </form>
-    
-    <p>New user? 
-        <a href="/register">Register here</a>
-    </p>
+
+<div class="form">
+  <h2>Welcome Back 👋</h2>
+  <p class="subtitle">Sign in to continue.</p>
+
+  <form method="POST" action="/login">
+    <input type="text" name="phone" 
+           placeholder="Phone Number" required>
+
+    <input type="password" name="password" 
+           placeholder="Password" required>
+
+    <div class="forgot">
+      <a href="#">Forgot Password?</a>
+    </div>
+
+    <button class="btn" type="submit">Login</button>
+  </form>
+
+  <p class="bottom-text">
+    New here? <a href="/register">Register</a>
+  </p>
+</div>
+
 </body>
 </html>

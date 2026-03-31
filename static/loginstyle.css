@@ -1,0 +1,140 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #16222A, #3A6073);
+}
+
+
+.form {
+  width: 330px;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+
+  color: #fff;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #ddd;
+  margin-bottom: 22px;
+}
+
+
+form input {
+  width: 100%;
+  padding: 11px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: none;
+
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+
+form input::placeholder {
+  color: rgba(255,255,255,0.8);
+}
+
+
+form input:focus {
+  outline: none;
+  background: rgba(255,255,255,0.3);
+}
+
+
+.password-field {
+  position: relative;
+}
+
+#showPass {
+  display: none;
+}
+
+
+.password-input {
+  padding-right: 35px;
+
+ 
+  -webkit-text-security: disc;
+}
+
+
+#showPass:checked ~ .password-input {
+  -webkit-text-security: none;
+}
+
+
+.toggle-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.toggle-icon::after {
+  content: "👁️";
+}
+
+#showPass:checked ~ .toggle-icon::after {
+  content: "🙈";
+}
+
+
+.btn {
+  width: 100%;
+  padding: 11px;
+  border: none;
+  border-radius: 8px;
+
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+
+.bottom-text {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.bottom-text a {
+  color: #76d1ea;
+}
+.forgot {
+  text-align: right;
+  margin-top: -8px;
+  margin-bottom: 15px;
+}
+
+.forgot a {
+  font-size: 13px;
+  color: #8fe0f6;
+  text-decoration: none;
+}
+
+.forgot a:hover {
+  text-decoration: underline;
+}

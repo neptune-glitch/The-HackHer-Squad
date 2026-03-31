@@ -1,0 +1,156 @@
+/* homepage css */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #16222A, #3A6073);
+  color: white;
+}
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+}
+
+.navbar img {
+  height: 55px;
+  filter: drop-shadow(0 0 8px rgba(0,168,232,0.6));
+}
+
+.navbar h2 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #e6f7ff;
+}
+.text {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 700;
+  margin-top: 40px;
+  line-height: 1.3;
+}
+
+.gigworkers {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.gigworkers p {
+  font-size: 18px;
+  color: #d1d5db;
+}
+.gig-buttons {
+  padding: 16px 40px;
+  font-size: 18px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 600;
+}
+
+
+.primary {
+  background: #00aaff;
+  color: white;
+}
+
+
+.secondary {
+  background: transparent;
+  border: 2px solid #00aaff;
+  color: #00aaff;
+}
+
+
+.primary:hover {
+  background: #008ecc;
+}
+
+.secondary:hover {
+  background: #00aaff;
+  color: white;
+}
+.features {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 50px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 25px;
+  margin: 15px;
+  border-radius: 12px;
+  width: 260px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+}
+
+.card h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 15px;
+  color: #d1d5db;
+}
+.price {
+  font-weight: bold;
+  color: #00aaff;
+  font-size: 18px;
+}
+.example {
+  margin: 70px auto;
+  max-width: 750px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  padding: 35px;
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+  transition: 0.3s;
+}
+
+.example:hover {
+  transform: scale(1.02);
+}
+.example h3{
+  color: rgb(76, 200, 238);
+}
+
+.example h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: #ffffff;
+}
+
+.ex-text {
+  font-size: 16px;
+  color: #d1d5db;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.ex-highlight {
+  margin-top: 15px;
+  font-size: 17px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.ex-ending {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #f17425;
+  font-weight: 600;
+}
+

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard - GigShield</title>
+  <link rel="stylesheet" href="/static/homestyle.css">
+  <style>
+    .dashboard-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    .info-card {
+      background: rgba(255,255,255,0.08);
+      padding: 25px;
+      margin: 15px 0;
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+    }
+    .info-card h2 {
+      color: #00aaff;
+      margin-bottom: 15px;
+    }
+    .info-card p {
+      font-size: 16px;
+      color: #d1d5db;
+      margin: 8px 0;
+    }
+    .alert-red {
+      background: rgba(231,76,60,0.3);
+      border: 2px solid #e74c3c;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 15px 0;
+      text-align: center;
+    }
+    .alert-green {
+      background: rgba(39,174,96,0.3);
+      border: 2px solid #27ae60;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 15px 0;
+      text-align: center;
+    }
+    .risk-high { color: #e74c3c; font-weight: bold; }
+    .risk-medium { color: #f39c12; font-weight: bold; }
+    .risk-low { color: #27ae60; font-weight: bold; }
+    .nav-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      background: #00aaff;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .nav-links a:hover {
+      background: #008ecc;
+    }
+    .logout {
+      background: #e74c3c !important;
+    }
+  </style>
+</head>
+<body>
+
+<div class="navbar">
+  <img src="https://png.pngtree.com/png-vector/20250422/ourmid/pngtree-blue-shield-badge-clipart-illustration-png-image_16042877.png" alt="logo">
+  <h2>GIG SHIELD DASHBOARD</h2>
+</div>
+
+<div class="dashboard-container">
+
+  <!-- Welcome Section -->
+  <div class="info-card">
+    <h2>👋 Welcome {{ worker[1] }}!</h2>
+    <p>📱 Platform: {{ worker[5] }}</p>
+    <p>📍 Zone: {{ worker[3] }}</p>
+    <p>💳 UPI ID: {{ worker[4] }}</p>
+    <p>📋 Plan: {{ worker[6] }}</p>
+  </div>
+
+  <!-- Weather Section -->
+  <div class="info-card">
+    <h2>🌤️ Delhi Weather Right Now</h2>
+    <p>🌡️ Temperature: {{ weather['temp'] }}°C</p>
+    <p>🌧️ Rainfall: {{ weather['rainfall'] }}mm</p>
+    <p>💧 Humidity: {{ weather['humidity'] }}%</p>
+    <p>☁️ Condition: {{ weather['description'] }}</p>
+  </div>
+
+  <!-- Risk Score Section -->
+  <div class="info-card">
+    <h2>⚡ Your AI Risk Score</h2>
+    <p>Risk Score: <strong>{{ risk_score }}/100</strong></p>
+    <p>Risk Level: <strong>{{ risk_level }}</strong></p>
+    <p>💰 Your Weekly Premium: <strong>₹{{ premium }}</strong></p>
+  </div>
+
+  <!-- Claim Section -->
+  {% if claim_triggered %}
+  <div class="alert-red">
+    <h2>⚠️ DISRUPTION DETECTED!</h2>
+    <p>Type: {{ disruption_type }}</p>
+    <p>Fraud Check: {{ fraud_status }}</p>
+    {% if "APPROVED" in fraud_status %}
+    <h3>💸 ₹500 Sent to {{ worker[4] }}</h3>
+    <p>Payment Processing...</p>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="alert-green">
+    <h2>✅ No Disruptions Today!</h2>
+    <p>Your coverage is active and working!</p>
+    <p>Stay safe and keep delivering! 💪</p>
+  </div>
+  {% endif %}
+
+  <!-- Navigation Links -->
+  <div class="nav-links">
+    <a href="/claims">🔔 View Claims</a>
+    <a href="/policy">📋 View Policy</a>
+    <a href="/financial">💰 Financial Model</a>
+    <a href="/logout" class="logout">🚪 Logout</a>
+  </div>
+
+</div>
+
+</body>
+</html>
