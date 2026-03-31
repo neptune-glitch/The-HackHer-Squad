@@ -8,7 +8,7 @@ app.secret_key = "gigshield2026"
 
 # ─── WEATHER API ──────────────────────────
 def get_delhi_weather():
-    api_key = "153b4130cd47b17c07d7462e65251ae9"
+    api_key = "nffff"
     url = f"http://api.openweathermap.org/data/2.5/weather?q=Delhi,IN&appid={api_key}&units=metric"
     
     try:
