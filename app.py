@@ -10,7 +10,7 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "fallback_secret")
 
-# ─── WEATHER API ──────────────────────────
+#weather fun that takes real time weather
 def get_delhi_weather(city="Delhi"):
     api_key = os.getenv('WEATHER_API_KEY')
     city_name = city.split(",")[0].strip()
@@ -39,7 +39,7 @@ def default_weather(city="Delhi"):
         'city': city
     }
 
-# ─── RISK SCORE ───────────────────────────
+# check weather the person is correct or not
 def calculate_risk_score(zone, rainfall, temp):
     score = 0
     zone_lower = zone.lower()
@@ -70,7 +70,7 @@ def calculate_risk_score(zone, rainfall, temp):
         score += 5
     return score
 
-# ─── PREMIUM CALCULATOR ───────────────────
+# it calculate the how much money should the person gets
 def calculate_premium(risk_score, plan):
     if "Basic" in plan:
         base = 25
@@ -86,7 +86,7 @@ def calculate_premium(risk_score, plan):
         return base + 5
     return base
 
-# ─── FRAUD DETECTION ──────────────────────
+# it checks whether the person is right or wrong
 def fraud_detection(worker_id):
     conn = sqlite3.connect('gigshield.db')
     cursor = conn.cursor()
@@ -104,7 +104,7 @@ def fraud_detection(worker_id):
         return "UNDER REVIEW 🔍", fraud_score
     return "APPROVED ✅", fraud_score
 
-# ─── DATABASE SETUP ───────────────────────
+# datebase 
 def create_database():
     conn = sqlite3.connect('gigshield.db')
     cursor = conn.cursor()
@@ -133,12 +133,12 @@ def create_database():
     conn.commit()
     conn.close()
 
-# ─── HOME ─────────────────────────────────
+# HOME 
 @app.route('/')
 def home():
     return render_template('home.html')
 
-# ─── REGISTER ─────────────────────────────
+# REGISTER
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -162,7 +162,7 @@ def register():
         return redirect('/login')
     return render_template('register.html')
 
-# ─── LOGIN ────────────────────────────────
+# it connect login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -184,13 +184,13 @@ def login():
         return "Invalid login!"
     return render_template('login.html')
 
-# ─── LOGOUT ───────────────────────────────
+# logout function
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/')
 
-# ─── DASHBOARD ────────────────────────────
+# dashboard
 @app.route('/dashboard')
 def dashboard():
     if 'worker_id' not in session:
@@ -224,7 +224,7 @@ def dashboard():
         fraud_status=fraud_status
     )
 
-# ─── CLAIMS ───────────────────────────────
+# claims page
 @app.route('/claims')
 def claims():
     if 'worker_id' not in session:
@@ -256,7 +256,7 @@ def claims():
         weather=weather
     )
 
-# ─── POLICY ───────────────────────────────
+# policy page
 @app.route('/policy')
 def policy():
     if 'worker_id' not in session:
@@ -268,7 +268,7 @@ def policy():
     conn.close()
     return render_template('policy.html', worker=worker)
 
-# ─── FINANCIAL ────────────────────────────
+# finanical page
 @app.route('/financial')
 def financial():
     if 'worker_id' not in session:
@@ -290,12 +290,12 @@ def financial():
         profit=profit
     )
 
-# ─── TEST WEATHER ─────────────────────────
+#it check weather of that place
 @app.route('/test-weather')
 def test_weather():
     return str(get_delhi_weather())
 
-# ─── RUN ──────────────────────────────────
+# run
 if __name__ == '__main__':
     create_database()
     app.run(debug=True)
