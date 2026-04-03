@@ -5,38 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GigShield - Financial Overview</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      min-height: 100vh;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100">
+<body>
 
-<div class="max-w-md mx-auto p-4">
+<div class="max-w-md mx-auto p-4 pt-8">
 
-  <h1 class="text-2xl font-bold text-center text-blue-600 mb-4">Financial Overview</h1>
+  <h1 class="text-2xl font-bold text-center text-cyan-400 mb-6">💰 Financial Model</h1>
 
-  <!-- Earnings -->
-  <div class="bg-white rounded-2xl shadow p-4 mb-4">
-    <h2 class="font-semibold text-lg">This Month</h2>
-    <p class="text-gray-600">Delivery Earnings</p>
-    <p class="text-xl font-bold">₹18,000</p>
+  <!-- Total Workers -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
+    <h2 class="font-semibold text-lg text-cyan-300">Total Workers Enrolled</h2>
+    <p class="text-3xl font-bold">{{ total_workers }}</p>
   </div>
 
-  <!-- Loss Prevented -->
-  <div class="bg-white rounded-2xl shadow p-4 mb-4">
-    <h2 class="font-semibold text-lg">Loss Prevented</h2>
-    <p class="text-green-600 text-xl font-bold">₹3,000 Saved</p>
+  <!-- Weekly Premium -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
+    <h2 class="font-semibold text-lg text-cyan-300">Weekly Premium Collected</h2>
+    <p class="text-3xl font-bold text-green-400">₹{{ weekly_premium }}</p>
   </div>
 
-  <!-- Premium Paid -->
-  <div class="bg-white rounded-2xl shadow p-4 mb-4">
-    <h2 class="font-semibold text-lg">Premium Paid</h2>
-    <p class="text-gray-600">₹160 this month</p>
+  <!-- Expected Claims -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
+    <h2 class="font-semibold text-lg text-cyan-300">Expected Claims / Week</h2>
+    <p class="text-3xl font-bold">{{ expected_claims }}</p>
   </div>
 
-  <!-- Net Benefit -->
-  <div class="bg-white rounded-2xl shadow p-4">
-    <h2 class="font-semibold text-lg">Net Benefit</h2>
-    <p class="text-blue-600 text-xl font-bold">+₹2,840</p>
+  <!-- Total Payouts -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
+    <h2 class="font-semibold text-lg text-cyan-300">Total Payouts / Week</h2>
+    <p class="text-3xl font-bold text-red-400">₹{{ total_payouts }}</p>
   </div>
+
+  <!-- Weekly Profit -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
+    <h2 class="font-semibold text-lg text-cyan-300">Weekly Profit</h2>
+    <p class="text-3xl font-bold text-green-400">₹{{ profit }}</p>
+  </div>
+
+  <!-- Back Button -->
+  <a href="/dashboard" class="block text-center bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-xl mt-4">
+    ← Back to Dashboard
+  </a>
 
 </div>
 

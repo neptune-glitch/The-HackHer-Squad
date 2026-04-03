@@ -5,46 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GigShield - Policy Plans</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      min-height: 100vh;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100">
+<body>
 
-<div class="max-w-md mx-auto p-4">
+<div class="max-w-md mx-auto p-4 pt-8">
 
-  <h1 class="text-2xl font-bold text-center text-blue-600 mb-4">Choose Your Plan</h1>
+  <h1 class="text-2xl font-bold text-center text-cyan-400 mb-6">📋 Choose Your Plan</h1>
 
   <!-- Basic Plan -->
-  <div class="bg-white rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-lg font-semibold">Basic Plan</h2>
-    <p class="text-gray-500 mb-2">₹25/week</p>
-    <ul class="text-sm mb-3">
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
+    <h2 class="text-lg font-semibold text-cyan-300">Basic Plan</h2>
+    <p class="text-gray-300 mb-2">₹25/week</p>
+    <ul class="text-sm mb-3 text-gray-200">
       <li>✔ ₹300 per claim</li>
       <li>✔ Covers pollution & rain</li>
     </ul>
-    <button class="w-full bg-blue-500 text-white py-2 rounded-xl">Select</button>
+    <button class="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-xl">Select</button>
   </div>
 
   <!-- Standard Plan -->
-  <div class="bg-white rounded-2xl shadow p-4 mb-4 border-2 border-blue-500">
-    <h2 class="text-lg font-semibold">Standard Plan ⭐</h2>
-    <p class="text-gray-500 mb-2">₹40/week</p>
-    <ul class="text-sm mb-3">
+  <div class="bg-white bg-opacity-20 border-2 border-cyan-400 rounded-2xl shadow p-4 mb-4 text-white">
+    <h2 class="text-lg font-semibold text-cyan-300">Standard Plan ⭐</h2>
+    <p class="text-gray-300 mb-2">₹40/week</p>
+    <ul class="text-sm mb-3 text-gray-200">
       <li>✔ ₹500 per claim</li>
       <li>✔ Covers all disruptions</li>
     </ul>
-    <button class="w-full bg-blue-600 text-white py-2 rounded-xl">Select</button>
+    <button class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-xl">Select</button>
   </div>
 
   <!-- Premium Plan -->
-  <div class="bg-white rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-lg font-semibold">Premium Plan</h2>
-    <p class="text-gray-500 mb-2">₹60/week</p>
-    <ul class="text-sm mb-3">
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
+    <h2 class="text-lg font-semibold text-cyan-300">Premium Plan</h2>
+    <p class="text-gray-300 mb-2">₹60/week</p>
+    <ul class="text-sm mb-3 text-gray-200">
       <li>✔ ₹800 per claim</li>
       <li>✔ Priority payouts</li>
     </ul>
-    <button class="w-full bg-blue-500 text-white py-2 rounded-xl">Select</button>
+    <button class="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-xl">Select</button>
   </div>
+
+  <!-- What We Cover -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
+    <h2 class="text-lg font-semibold text-cyan-300 mb-2">✅ What We Cover</h2>
+    <ul class="text-sm text-gray-200 space-y-1">
+      <li>🌧️ Heavy rain / floods</li>
+      <li>🌡️ Extreme heat (&gt;44°C)</li>
+      <li>🌫️ Severe pollution / smog</li>
+      <li>🚫 Curfews / strikes</li>
+    </ul>
+  </div>
+
+  <!-- What We Don't Cover -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
+    <h2 class="text-lg font-semibold text-red-400 mb-2">❌ Not Covered</h2>
+    <ul class="text-sm text-gray-200 space-y-1">
+      <li>War / military conflicts</li>
+      <li>Pandemics / epidemics</li>
+      <li>Vehicle damage / repair</li>
+      <li>Health / medical bills</li>
+    </ul>
+  </div>
+
+  <!-- Back Button -->
+  <a href="/dashboard" class="block text-center bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-xl mt-2">
+    ← Back to Dashboard
+  </a>
 
 </div>
 
