@@ -118,7 +118,7 @@ These are our 5 automated triggers built specifically for Delhi:
 | Flash Flood Alert | Flood warning issued for Delhi sectors | Mock Government Alert API |
 | Local Curfew / Bandh | Curfew declared in worker's zone | Mock News API |
 
-**Zone Specific:** Claim fires ONLY when disruption is in worker's registered delivery zone (Dwarka/Lajpat Nagar/CP sectors) — not citywide.
+**Zone Specific:** Claim fires ONLY when disruption is in worker's registered delivery zone (Dwarka/Lajpat Nagar/CP sectors/Metropolitian cities) — not citywide.
 
 ---
 
@@ -204,9 +204,9 @@ Every worker gets a Risk Score when they register:
 
 | Layer | Technology | Why We Chose It |
 |-------|-----------|-----------------|
-| Frontend | React.js + Tailwind CSS | Fast UI, mobile friendly |
-| Backend | Node.js + Express.js | Lightweight, fast API |
-| Database | MongoDB | Flexible data storage |
+| Frontend | HTML + CSS + Tailwind CSS | Fast UI, mobile friendly |
+| Backend | Python +Flask | Lightweight, fast API |
+| Database | SQLite | Flexible data storage |
 | AI/ML | Python + scikit-learn | Easy ML model building |
 | Weather API | OpenWeatherMap (free tier) | Free, real-time data |
 | AQI API | CPCB Mock API | Delhi pollution data |

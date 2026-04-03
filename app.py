@@ -14,7 +14,24 @@ app.secret_key = os.getenv("SECRET_KEY", "fallback_secret")
 def get_delhi_weather(city="Delhi"):
     api_key = os.getenv('WEATHER_API_KEY')
     city_name = city.split(",")[0].strip()
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name},IN&appid={api_key}&units=metric"
+    
+    # Map Delhi zones to real city names for API
+    zone_to_city = {
+        "Dwarka": "Delhi",
+        "Lajpat Nagar": "Delhi",
+        "Rohini": "Delhi",
+        "Connaught Place": "Delhi",
+        "Mumbai": "Mumbai",
+        "Bangalore": "Bangalore",
+        "Chennai": "Chennai",
+        "Kolkata": "Kolkata",
+        "Hyderabad": "Hyderabad",
+        "Pune": "Pune",
+        "Ahmedabad": "Ahmedabad"
+    }
+    api_city = zone_to_city.get(city_name, city_name)
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={api_city},IN&appid={api_key}&units=metric"
+
     try:
         response = requests.get(url, timeout=5)
         data = response.json()
@@ -25,7 +42,7 @@ def get_delhi_weather(city="Delhi"):
             'rainfall': data.get('rain', {}).get('1h', 0),
             'humidity': data['main']['humidity'],
             'description': data['weather'][0]['description'],
-            'city': city_name
+            'city': data['name']  
         }
     except:
         return default_weather(city_name)
