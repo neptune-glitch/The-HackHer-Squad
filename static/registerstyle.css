@@ -1,0 +1,152 @@
+/* registerpage css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+}
+
+.account {
+  width: 360px;
+  padding: 35px;
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  color: white;
+}
+
+
+.account h1 {
+  margin-bottom: 10px;
+}
+
+
+.subtitle {
+  font-size: 14px;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.profile-type {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.profile-type label {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.single-option {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: white;
+
+  font-weight: 500;
+}
+
+.options input:checked + label {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: white;
+}
+
+
+.input-group{
+  position: relative; 
+  margin-bottom: 18px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  outline: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.input-group label {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  color: #aaa;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.input-group input:focus + label,
+.input-group input:valid + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #00c6ff;
+} 
+
+.select-group {
+  margin-bottom: 18px;
+} 
+
+.select-group select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+
+select option {
+  color: black;
+}
+
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 15px rgba(0, 198, 255, 0.6);
+}
+
+.login-link {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.login-link a {
+  color: #00c6ff;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
