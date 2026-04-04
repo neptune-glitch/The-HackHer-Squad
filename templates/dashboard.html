@@ -36,16 +36,31 @@
 
   <!-- Welcome -->
   <div class="card">
-    <h2> Welcome {{ worker[1] }}!</h2>
-    <p> Platform: {{ worker[5] }}</p>
-    <p> Zone: {{ worker[3] }}</p>
-    <p> UPI: {{ worker[4] }}</p>
-    <p> Plan: {{ worker[6] }}</p>
-  </div>
+  <h2> Welcome {{ worker[1] }}!</h2>
+  <p> Platform: {{ worker[5] }}</p>
+  <p> Zone: {{ worker[3] }}</p>
+  <p> UPI: {{ worker[4] }}</p>
+  <p> Plan: {{ worker[6] }}</p>
+
+  <!-- 🔁 CHANGE LOCATION FEATURE -->
+  <form method="POST" action="/update_zone" style="margin-top:15px;">
+    <label><b>Change Location:</b></label><br><br>
+    <select name="zone" style="padding:8px; border-radius:6px;">
+      <option>Noida</option>
+      <option>Delhi</option>
+      <option>Mumbai</option>
+      <option>Hyderabad</option>
+      <option>Pune</option>
+    </select>
+    <button type="submit" style="padding:8px 12px; border:none; border-radius:6px; background:#00aaff; color:white;">
+      Update
+    </button>
+  </form>
+</div>
 
   <!-- Weather -->
   <div class="card">
-    <h2>Live Weather — {{ weather['city'] }}</h2>
+    <h2>Live Weather — {{ weather.city }}</h2>
     <p> Temperature: <strong>{{ weather['temp'] }}°C</strong></p>
     <p> Rainfall: <strong>{{ weather['rainfall'] }}mm</strong></p>
     <p> Humidity: <strong>{{ weather['humidity'] }}%</strong></p>
