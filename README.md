@@ -1,4 +1,4 @@
-# 🛡️ GigShield — AI-Powered Parametric Insurance for E-Commerce Delivery Partners
+# Helix — AI-Powered Predictive Insurance for Gig Workers
 
 > **Team: HackHer Squad | Guidewire DEVTrails 2026**
 
@@ -6,7 +6,7 @@
 
 ## 📌 Problem Statement
 
-E-commerce delivery partners working for platforms like **Amazon and Flipkart** in cities like **Delhi** are the backbone of India's digital economy. However, external disruptions such as **severe pollution/smog, extreme heat, and heavy rain/floods** can completely halt their work — causing them to lose **20–30% of their monthly income**.
+E-commerce delivery partners working for platforms like **Amazon and Flipkart** in cities like **Delhi** are the backbone of India's digital economy. However, external disruptions such as **severe pollution (smog), extreme heat, and heavy rain/floods** can completely halt their work — causing them to lose **20–30% of their monthly income**.
 
 Currently, these gig workers have **no financial safety net** against such uncontrollable events. When disruptions occur, they bear the full loss alone.
 
@@ -14,261 +14,202 @@ Currently, these gig workers have **no financial safety net** against such uncon
 
 ## 👤 Who Is Our User REALLY?
 
-**Name:** Ramesh Kumar
-**Age:** 24 years old
-**City:** Delhi
-**Delivery Zone:** Dwarka, Lajpat Nagar, Connaught Place — Delhi
-**Platform:** Amazon & Flipkart Delivery Partner
-**Device:** Budget Android smartphone (Redmi/Realme, 4G)
-**Education:** 12th pass
-**Work Hours:** 9–11 hours/day, 6 days a week
-**Daily Earnings:** ₹600–₹900/day
-**Weekly Earnings:** ₹3,600–₹5,400/week
-**How He Gets Paid:** Weekly UPI transfer from Amazon/Flipkart
+**Name:** Ramesh Kumar  
+**Age:** 24 years old  
+**City:** Delhi  
+**Delivery Zone:** Dwarka, Lajpat Nagar, Connaught Place  
+**Platform:** Amazon & Flipkart Delivery Partner  
+**Device:** Budget Android smartphone (4G)  
+**Work Hours:** 9–11 hours/day  
 
-### Ramesh's Real Life Story in Delhi:
+Ramesh lives in a rented room and sends money home every week. His income is uncertain and highly dependent on external conditions.
 
-Ramesh lives in a rented room in Delhi and sends money home every week to his family in a village. Every morning he wakes up not knowing if he will earn today.
+### Real Problems He Faces:
 
-**Delhi specific problems Ramesh faces:**
-
-- 🌫️ **Winter Smog (Nov–Jan):** AQI crosses 400+ in Delhi sectors. Ramesh cannot breathe properly while riding. He stays home. **Zero income.**
-- 🌡️ **Summer Heat (April–June):** Temperature crosses 45°C in Delhi. Riding for 10 hours is dangerous. He cannot work. **Zero income.**
-- 🌧️ **Monsoon Floods (July–Sept):** Heavy rain floods roads in Dwarka, Lajpat Nagar areas. Packages cannot be delivered. **Zero income.**
-- 🚫 **He has no savings, no insurance, no safety net.**
-- At end of week he is short on rent, food, and phone recharge.
-
-### Why Existing Insurance Does NOT Work for Ramesh:
-- Traditional insurance is **monthly** — Ramesh thinks and earns **weekly**
-- Claims require **paperwork** — Ramesh has no time for that
-- Most insurance covers **health or vehicle** — not his **lost daily wages**
-- Premium is too **expensive** for his income level
+- 🌫️ **Winter Smog:** AQI crosses 400 → cannot work → **Zero income**
+- 🌡️ **Extreme Heat:** 45°C+ → unsafe to ride → **Zero income**
+- 🌧️ **Floods:** Roads blocked → deliveries stop → **Zero income**
+- 🚫 No savings, no insurance, no backup
 
 ---
 
-## 💡 Our Solution — GigShield
+## 💡 Our Solution — Helix
 
-**GigShield** is a simple web platform where Ramesh pays a small weekly premium (₹25–₹60) and gets automatic income protection when external disruptions in **Delhi** stop him from working.
+**Helix** is a simple web platform where gig workers pay a small weekly premium (₹25–₹60) and receive **automatic income protection** when disruptions stop them from working.
 
-**No paperwork. No phone calls. Money directly in his UPI wallet within minutes.**
+**No paperwork. No claims process. Fully automated payouts.**
 
 ---
 
-## 🔄 How The App Works — Step by Step
+### 🧠 What Makes Helix Intelligent?
 
-### Step 1 — Ramesh Registers (2 minutes)
-- Opens GigShield on his phone browser (no app download needed)
-- Enters: Name, Phone Number, Delivery Zone (Alpha/Beta/Gamma), UPI ID
-- Selects his platform: Amazon or Flipkart
-- AI creates his risk profile based on his Delhi zone
+Helix is not just reactive — it is **predictive and assistive**.
 
-### Step 2 — He Picks a Weekly Plan
-- Sees 3 plan options (Basic / Standard / Premium)
-- AI shows personalized price based on his specific zone risk
-- He pays weekly premium via UPI (₹25–₹60/week)
-- Coverage starts immediately
+- 🔮 Predicts disruption risk for the next 24 hours (with confidence %)
+- 🧠 Suggests best working hours based on weather
+- 💰 Estimates potential income loss
+- 🔍 Explains fraud decisions transparently
 
-### Step 3 — System Monitors Delhi 24/7
-- GigShield checks weather, AQI, flood alerts every 30 minutes
-- Monitors Ramesh's specific delivery zone
-- No action needed from Ramesh at all
+👉 Workers can **plan ahead**, not just react after losing income.
 
-### Step 4 — Disruption Happens in Delhi
-- Example: AQI crosses 400 in Alpha sector at 7am
-- System automatically detects this in Ramesh's zone
+---
 
-### Step 5 — Claim Auto-Triggered
-- System checks: Is Ramesh's policy active? ✅
-- System checks: Is disruption in his registered zone? ✅
-- System checks: Is this a genuine claim? ✅ (AI fraud check)
-- Claim approved in under 2 minutes
+## 🔄 How The App Works
 
-### Step 6 — Money Reaches Ramesh
-- ₹500 credited to his UPI instantly
-- He gets SMS + app notification
-- **He didn't fill any form. He didn't call anyone.**
+1. Worker registers (2 minutes)
+2. Chooses weekly plan
+3. System monitors weather + risk
+4. Disruption detected automatically
+5. Claim triggered instantly
+6. Money credited via UPI
 
 ---
 
 ## 💰 Weekly Premium Model
 
-| Plan | Weekly Premium | Coverage Per Disruption Day | Max Days Covered/Week |
-|------|---------------|----------------------------|-----------------------|
-| Basic | ₹25/week | ₹300/day | 2 days |
-| Standard | ₹40/week | ₹500/day | 2 days |
-| Premium | ₹60/week | ₹700/day | 2 days |
+| Plan | Weekly Premium | Coverage/Day |
+|------|--------------|-------------|
+| Basic | ₹25 | ₹300 |
+| Standard | ₹40 | ₹500 |
+| Premium | ₹60 | ₹700 |
 
-### Why Weekly Pricing?
-- Ramesh gets paid **weekly** by Amazon/Flipkart
-- He cannot commit to monthly payments
-- Weekly model matches his income cycle perfectly
-- He can pause or renew every week
+👉 Designed for **weekly earning workers**
 
 ---
 
-## ⚡ Parametric Triggers — Delhi Specific
+## ⚡ Parametric Triggers
 
-These are our 5 automated triggers built specifically for Delhi:
-
-| Trigger | Exact Condition | Data Source |
-|---------|----------------|-------------|
-| Severe Pollution / Smog | AQI > 400 in worker's Delhi zone | CPCB Mock API |
-| Extreme Heat | Temperature > 44°C for 4+ hours | OpenWeatherMap API (free tier) |
-| Heavy Rain / Flood | Rainfall > 50mm in 6 hours in delivery zone | OpenWeatherMap API (free tier) |
-| Flash Flood Alert | Flood warning issued for Delhi sectors | Mock Government Alert API |
-| Local Curfew / Bandh | Curfew declared in worker's zone | Mock News API |
-
-**Zone Specific:** Claim fires ONLY when disruption is in worker's registered delivery zone (Dwarka/Lajpat Nagar/CP sectors/Metropolitian cities) — not citywide.
+| Trigger | Condition |
+|--------|----------|
+| Smog | AQI > 400 |
+| Heat | Temp > 44°C |
+| Rain/Flood | Rainfall > 50mm |
+| Flood Alert | Govt warning |
+| Curfew | Local shutdown |
 
 ---
 
-## 🤖 How Our AI REALLY Works
+## 🤖 AI System Design
 
-### AI Feature 1 — Dynamic Premium Calculation
-
-**What goes IN:**
-- Worker's delivery zone in Delhi (Alpha 1 / Beta 2 / Gamma)
-- Historical disruption data of that zone (smog, heat, floods)
-- Current season (Winter = smog risk, Summer = heat risk, Monsoon = flood risk)
-- Worker's honest claim history
-- Weather and AQI forecast for next 7 days
-
-**What comes OUT:**
-- Personalized weekly premium for that specific worker
-
-**Real Delhi Example:**
-- Ramesh works in **Dwarka sector** — historically gets flooded every monsoon
-- It is **July** (peak monsoon)
-- AI calculates: Base ₹40 + Flood zone risk ₹10 + Monsoon season ₹5 = **₹55/week**
-- Another worker in safer **Connaught Place sector** gets: Base ₹40 - Safe zone ₹8 = **₹32/week**
-
-**Algorithm:**
-- Phase 1 and 2: Rule-based scoring model
-- Phase 3: Linear Regression model trained on mock historical data
+### 1. Dynamic Premium Calculation
+- Based on zone, season, weather, history
+- Personalized pricing
 
 ---
 
-### AI Feature 2 — Fraud Detection (4 Checks)
+### 2. Fraud Detection (Enhanced)
 
-**Check 1 — GPS Zone Check**
-- Worker's last known location must be inside the disruption affected zone
-- If worker is outside Delhi → claim rejected ❌
+We upgraded fraud detection to include:
 
-**Check 2 — Platform Activity Check**
-- System checks if worker had active deliveries scheduled that day
-- No active orders + claiming disruption → flagged 🔍
+- Claim frequency analysis
+- Same-day multiple claims detection
+- Pattern-based anomaly detection
 
-**Check 3 — Duplicate Claim Check**
-- One claim per disruption event per worker
-- Claiming twice for same smog event → auto rejected ❌
-
-**Check 4 — Pattern Analysis**
-- Worker claiming every single week → suspicious → flagged 🔍
-- Normal workers don't face disruptions every week
-
-**Fraud Risk Score:**
-
-| Score | Risk Level | Action |
-|-------|-----------|--------|
-| 0–30 | Low | Auto approved ✅ |
-| 31–60 | Medium | Manual review 🔍 |
-| 61–100 | High | Rejected ❌ |
+👉 Helix also shows **WHY a claim is flagged** (not a black box)
 
 ---
 
-### AI Feature 3 — Risk Profiling
-
-Every worker gets a Risk Score when they register:
-
-| Factor | Low Risk | High Risk |
-|--------|----------|-----------|
-| Delivery Zone | Gamma (less flood prone) | Alpha/Beta (flood prone) |
-| Season | Winter (less rain) | Monsoon (heavy rain) |
-| Claim History | No suspicious claims | Repeated claims |
-| AQI History | Zone rarely hits 400+ | Zone regularly hits 400+ |
+### 3. Risk Profiling
+Each worker gets a dynamic risk score based on:
+- Zone risk
+- Seasonal patterns
+- Claim behavior
 
 ---
 
-## 🖥️ Platform — Web App
+### 🔮 AI-Powered Insights (NEW)
 
-**Why Web App and not Mobile App?**
-- Ramesh uses a budget Android phone with low storage
-- Cannot install another app
-- Web app opens directly in Chrome browser
-- Works on 4G connection
-- No download needed → more Delhi workers will use it
+Helix goes beyond automation → provides **decision-support intelligence**
+
+#### 1. Disruption Prediction
+- Predicts next 24-hour risk
+- Shows confidence %
+
+#### 2. Smart Work Suggestions
+- Suggests best working hours  
+- Example: *“Work early morning, avoid afternoon heat”*
+
+#### 3. Income Loss Prediction
+- Example: *“You may lose ₹1200 this week”*
+
+#### 4. Explainable Fraud Detection
+- Shows reasons:
+  - High frequency
+  - Same-day claims
+  - Suspicious pattern
+
+👉 This transforms Helix into an **AI assistant for gig workers**
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology | Why We Chose It |
-|-------|-----------|-----------------|
-| Frontend | HTML + CSS + Tailwind CSS | Fast UI, mobile friendly |
-| Backend | Python +Flask | Lightweight, fast API |
-| Database | SQLite | Flexible data storage |
-| AI/ML | Python + scikit-learn | Easy ML model building |
-| Weather API | OpenWeatherMap (free tier) | Free, real-time data |
-| AQI API | CPCB Mock API | Delhi pollution data |
-| Payment | Razorpay Test Mode | UPI simulation for demo |
-| Hosting | Vercel + Render | Free hosting |
-| Auth | JWT Tokens | Secure login |
+- Frontend: HTML + CSS + Tailwind  
+- Backend: Flask (Python)  
+- Database: SQLite  
+- APIs: OpenWeatherMap  
+- Payments: Razorpay (test)  
 
 ---
 
-## 📅 Development Plan
+## 🧠 How We Used AI (Transparency)
 
-### Phase 1 (March 4–20) — Ideation ✅
-- Research and Delhi persona definition ✅
-- Weekly premium model design ✅
-- Parametric trigger identification ✅
-- Tech stack finalization ✅
-- README documentation ✅
+We used AI as a **tool, not a replacement for thinking**.
 
-### Phase 2 (March 21–April 4) — Core Building
-- Worker registration and login
-- AI risk profiling for Delhi zones
-- Weekly insurance policy creation
-- Dynamic premium calculation
-- Claims management system
-- Weather + AQI API integration
+### Used AI for:
+- Flask boilerplate setup
+- Debugging assistance
+- Structuring documentation
 
-### Phase 3 (April 5–17) — Scale and Polish
-- Advanced fraud detection
-- Razorpay test mode payment
-- Worker dashboard
-- Admin/Insurer dashboard
-- Final demo video + pitch deck
+### Built by our team:
+- Risk scoring logic
+- Fraud detection with reasoning
+- Weekly premium model
+- Delhi-specific triggers
+- Predictive features (risk, income, work timing)
+
+👉 Our focus: **AI-assisted decision making + human problem solving**
 
 ---
 
-## ⚠️ Coverage — What We Cover and What We Don't
+## ⚠️ Coverage
 
-| NOT Covered ❌ | Covered ✅ |
-|---------------|-----------|
-| Health / Medical | Lost income due to smog/pollution |
-| Life insurance | Lost income due to extreme heat |
-| Vehicle repair | Lost income due to heavy rain/floods |
-| Accident claims | Lost income due to curfew/strike |
-
-**We ONLY insure LOST INCOME. Nothing else.**
+| Covered ✅ | Not Covered ❌ |
+|----------|-------------|
+| Lost income | Health |
+| Weather disruptions | Vehicle damage |
+| Curfew/strike | Accidents |
 
 ---
 
 ## 👥 Team — HackHer Squad
 
-- **Team Name:**  The HackHer Squad
-- **Hackathon:** Guidewire DEVTrails 2026
-- **University:** AKTU (Dr. A.P.J. Abdul Kalam Technical University)
-- **City:** Noida
-- **Platform:** Web Application
-
-### Team Members:
-1. Bharti Pathak — Research
-2. Supriya Verma — Documentation
-3. Sanjoli Singh — Video Production
-4. Nandini — Project Management
+AKTU, Noida  
+Guidewire DEVTrails 2026  
 
 ---
 
-*Built in India by The HackHer Squad*
+## Team Maembers 
+1. Bharti Pathak 
+2. Supriya Verma 
+3. Sanjoli Singh  
+4. Nandini
+
+## 🔄 Project Evolution
+
+In Phase 1, our project was initially submitted under the name **"GigShield"**.
+
+Based on feedback and our focus on building a more **distinct, original, and brandable solution**, we rebranded the project to **Helix** in Phase 2.
+
+This change reflects our shift from a generic concept to a more **unique, AI-driven and predictive platform**.
+
+## 🚀 Final Note
+
+Helix is not just an insurance product —  
+it is a **decision-support system for gig workers**.
+
+👉 Helping them **predict, plan, and protect their income**
+
+---
+
+*Built in India 🇮🇳 by HackHer Squad*

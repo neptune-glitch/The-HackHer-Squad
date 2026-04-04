@@ -212,15 +212,76 @@ def logout():
 def dashboard():
     if 'worker_id' not in session:
         return redirect('/login')
+    
     conn = sqlite3.connect('gigshield.db')
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM workers WHERE id=?', (session['worker_id'],))
     worker = cursor.fetchone()
     conn.close()
+    
     weather = get_delhi_weather(worker[3])
-    risk_score = calculate_risk_score(worker[3], weather['rainfall'], weather['temp'])
+    
+    # ─── VISIBLE AI BREAKDOWN ─────────────
+    zone_lower = worker[3].lower()
+    if "dwarka" in zone_lower or "mumbai" in zone_lower:
+        zone_score = 30
+    elif "lajpat" in zone_lower or "kolkata" in zone_lower:
+        zone_score = 25
+    elif "rohini" in zone_lower or "chennai" in zone_lower:
+        zone_score = 20
+    else:
+        zone_score = 10
+
+    month = datetime.now().month
+    if month in [7, 8, 9]:
+        season_score = 30
+        season_name = "Monsoon 🌧️"
+    elif month in [4, 5, 6]:
+        season_score = 20
+        season_name = "Summer 🌡️"
+    elif month in [11, 12, 1]:
+        season_score = 25
+        season_name = "Winter/Smog 🌫️"
+    else:
+        season_score = 10
+        season_name = "Normal ☀️"
+
+    if weather['rainfall'] > 50:
+        weather_score = 40
+    elif weather['temp'] > 44:
+        weather_score = 35
+    elif weather['temp'] > 40:
+        weather_score = 20
+    else:
+        weather_score = 5
+
+    risk_score = zone_score + season_score + weather_score
     risk_level = "HIGH 🔴" if risk_score >= 70 else "MEDIUM 🟡" if risk_score >= 40 else "LOW 🟢"
     premium = calculate_premium(risk_score, worker[6])
+
+    # ─── AI PREDICTION ────────────────────
+    prediction_confidence = min(95, risk_score + 10)
+    
+    if risk_score >= 70:
+        prediction_message = "⚠️ High disruption likely! Consider working early morning only"
+        best_time = "5:00 AM – 9:00 AM (cool & safe)"
+        avoid_time = "12:00 PM – 4:00 PM (peak heat/rain)"
+        income_loss = round(weather['temp'] * 15) if weather['temp'] > 35 else 0
+        smart_alert = f"🌡️ Temperature {weather['temp']}°C detected. High risk today. Stay hydrated!"
+    elif risk_score >= 40:
+        prediction_message = "🟡 Moderate disruption possible. Monitor weather"
+        best_time = "6:00 AM – 11:00 AM"
+        avoid_time = "2:00 PM – 5:00 PM"
+        income_loss = round(weather['temp'] * 5) if weather['temp'] > 38 else 0
+        smart_alert = f"☁️ Weather is uncertain today in {weather['city']}. Plan your deliveries wisely!"
+    else:
+        prediction_message = "✅ Low disruption chance. Good day to work!"
+        best_time = "All day is safe ✅"
+        avoid_time = "None"
+        income_loss = 0
+        smart_alert = f"✅ Great weather in {weather['city']} today! Maximize your deliveries!"
+
+    # ─── CLAIM & FRAUD ────────────────────
     claim_triggered = False
     disruption_type = ""
     if weather['rainfall'] > 50:
@@ -229,18 +290,30 @@ def dashboard():
     elif weather['temp'] > 44:
         claim_triggered = True
         disruption_type = "Extreme Heat 🌡️"
+
     fraud_status, fraud_score = fraud_detection(session['worker_id'])
+
     return render_template('dashboard.html',
         worker=worker,
         weather=weather,
         risk_score=risk_score,
         risk_level=risk_level,
+        zone_score=zone_score,
+        season_score=season_score,
+        weather_score=weather_score,
+        season_name=season_name,
         premium=premium,
+        prediction_confidence=prediction_confidence,
+        prediction_message=prediction_message,
+        best_time=best_time,
+        avoid_time=avoid_time,
+        income_loss=income_loss,
+        smart_alert=smart_alert,
         claim_triggered=claim_triggered,
         disruption_type=disruption_type,
-        fraud_status=fraud_status
+        fraud_status=fraud_status,
+        fraud_score=fraud_score
     )
-
 # claims page
 @app.route('/claims')
 def claims():

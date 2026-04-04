@@ -1,85 +1,377 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GigShield - Policy Plans</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Policy - Helix</title>
+  <link rel="stylesheet" href="/static/homestyle.css">
   <style>
-    body {
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      min-height: 100vh;
+    .policy-container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    .card {
+      background: rgba(255,255,255,0.08);
+      padding: 25px;
+      margin: 15px 0;
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+    }
+    .card h2 {
+      color: #00aaff;
+      margin-bottom: 15px;
+    }
+    .card p {
+      color: #d1d5db;
+      margin: 8px 0;
+      font-size: 15px;
+    }
+
+    /* Coverage Grid */
+    .coverage-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 15px 0;
+    }
+    .covered-box {
+      background: rgba(39,174,96,0.15);
+      border: 2px solid #27ae60;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .not-covered-box {
+      background: rgba(231,76,60,0.15);
+      border: 2px solid #e74c3c;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .covered-box h3 {
+      color: #27ae60;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+    .not-covered-box h3 {
+      color: #e74c3c;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+    .coverage-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 10px 0;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    /* Plan Cards */
+    .plan-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 15px;
+      margin: 15px 0;
+    }
+    .plan-card {
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .plan-basic {
+      background: rgba(39,174,96,0.15);
+      border: 2px solid #27ae60;
+    }
+    .plan-standard {
+      background: rgba(0,170,255,0.15);
+      border: 2px solid #00aaff;
+    }
+    .plan-premium {
+      background: rgba(138,43,226,0.15);
+      border: 2px solid #8e44ad;
+    }
+    .plan-card h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .plan-price {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .plan-card p {
+      color: #d1d5db;
+      font-size: 13px;
+      margin: 5px 0;
+    }
+
+    /* Trigger Table */
+    .trigger-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    .trigger-table th {
+      background: rgba(0,170,255,0.2);
+      color: #00aaff;
+      padding: 12px;
+      text-align: left;
+      font-size: 14px;
+    }
+    .trigger-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      color: #d1d5db;
+      font-size: 13px;
+    }
+    .trigger-table tr:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* Worker Plan Highlight */
+    .your-plan {
+      background: linear-gradient(135deg, rgba(0,170,255,0.2), rgba(138,43,226,0.2));
+      border: 2px solid #00aaff;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+    .your-plan h2 {
+      color: #f39c12;
+    }
+
+    /* Nav Links */
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .nav-links a {
+      background: #00aaff;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .nav-links a.red {
+      background: #e74c3c;
     }
   </style>
 </head>
-
 <body>
 
-<div class="max-w-md mx-auto p-4 pt-8">
-
-  <h1 class="text-2xl font-bold text-center text-cyan-400 mb-6">📋 Choose Your Plan</h1>
-
-  <!-- Basic Plan -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
-    <h2 class="text-lg font-semibold text-cyan-300">Basic Plan</h2>
-    <p class="text-gray-300 mb-2">₹25/week</p>
-    <ul class="text-sm mb-3 text-gray-200">
-      <li>✔ ₹300 per claim</li>
-      <li>✔ Covers pollution & rain</li>
-    </ul>
-    <button class="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-xl">Select</button>
-  </div>
-
-  <!-- Standard Plan -->
-  <div class="bg-white bg-opacity-20 border-2 border-cyan-400 rounded-2xl shadow p-4 mb-4 text-white">
-    <h2 class="text-lg font-semibold text-cyan-300">Standard Plan ⭐</h2>
-    <p class="text-gray-300 mb-2">₹40/week</p>
-    <ul class="text-sm mb-3 text-gray-200">
-      <li>✔ ₹500 per claim</li>
-      <li>✔ Covers all disruptions</li>
-    </ul>
-    <button class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-xl">Select</button>
-  </div>
-
-  <!-- Premium Plan -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
-    <h2 class="text-lg font-semibold text-cyan-300">Premium Plan</h2>
-    <p class="text-gray-300 mb-2">₹60/week</p>
-    <ul class="text-sm mb-3 text-gray-200">
-      <li>✔ ₹800 per claim</li>
-      <li>✔ Priority payouts</li>
-    </ul>
-    <button class="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-xl">Select</button>
-  </div>
-
-  <!-- What We Cover -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-2">✅ What We Cover</h2>
-    <ul class="text-sm text-gray-200 space-y-1">
-      <li>🌧️ Heavy rain / floods</li>
-      <li>🌡️ Extreme heat (&gt;44°C)</li>
-      <li>🌫️ Severe pollution / smog</li>
-      <li>🚫 Curfews / strikes</li>
-    </ul>
-  </div>
-
-  <!-- What We Don't Cover -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
-    <h2 class="text-lg font-semibold text-red-400 mb-2">❌ Not Covered</h2>
-    <ul class="text-sm text-gray-200 space-y-1">
-      <li>War / military conflicts</li>
-      <li>Pandemics / epidemics</li>
-      <li>Vehicle damage / repair</li>
-      <li>Health / medical bills</li>
-    </ul>
-  </div>
-
-  <!-- Back Button -->
-  <a href="/dashboard" class="block text-center bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-xl mt-2">
-    ← Back to Dashboard
-  </a>
-
+<div class="navbar">
+  <img src="https://png.pngtree.com/png-vector/20250422/ourmid/pngtree-blue-shield-badge-clipart-illustration-png-image_16042877.png" alt="logo">
+  <h2>HELIX — POLICY</h2>
 </div>
 
+<div class="policy-container">
+
+  <!-- Your Active Plan -->
+  <div class="your-plan">
+    <h2>📋 Your Active Policy</h2>
+    <p style="color:#d1d5db">👤 Worker: <strong style="color:white">{{ worker[1] }}</strong></p>
+    <p style="color:#d1d5db">📍 Zone: <strong style="color:white">{{ worker[3] }}</strong></p>
+    <p style="color:#d1d5db">📱 Platform: <strong style="color:white">{{ worker[5] }}</strong></p>
+    <p style="color:#d1d5db">💳 UPI: <strong style="color:white">{{ worker[4] }}</strong></p>
+    <p style="color:#d1d5db">🎫 Plan: <strong style="color:#f39c12">{{ worker[6] }}</strong></p>
+    <p style="color:#27ae60; margin-top:10px;">✅ Status: ACTIVE</p>
+  </div>
+
+  <!-- All Plans -->
+  <div class="card">
+    <h2>💰 Available Plans</h2>
+    <div class="plan-grid">
+
+      <div class="plan-card plan-basic">
+        <h3 style="color:#27ae60">Basic</h3>
+        <div class="plan-price" style="color:#27ae60">₹25<span style="font-size:14px">/week</span></div>
+        <p>Coverage: ₹300/day</p>
+        <p>Max: 2 days/week</p>
+        <p>Max payout: ₹600/week</p>
+      </div>
+
+      <div class="plan-card plan-standard">
+        <h3 style="color:#00aaff">Standard</h3>
+        <div class="plan-price" style="color:#00aaff">₹40<span style="font-size:14px">/week</span></div>
+        <p>Coverage: ₹500/day</p>
+        <p>Max: 2 days/week</p>
+        <p>Max payout: ₹1000/week</p>
+      </div>
+
+      <div class="plan-card plan-premium">
+        <h3 style="color:#8e44ad">Premium</h3>
+        <div class="plan-price" style="color:#8e44ad">₹60<span style="font-size:14px">/week</span></div>
+        <p>Coverage: ₹700/day</p>
+        <p>Max: 2 days/week</p>
+        <p>Max payout: ₹1400/week</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- COVERAGE EXCLUSIONS - JUDGES FEEDBACK -->
+  <div class="card">
+    <h2>📌 Coverage Details</h2>
+    <div class="coverage-grid">
+
+      <!-- What We Cover -->
+      <div class="covered-box">
+        <h3>✅ What We Cover</h3>
+        <div class="coverage-item">
+          <span>🌧️</span>
+          <span>Heavy rain and floods causing delivery halt</span>
+        </div>
+        <div class="coverage-item">
+          <span>🌡️</span>
+          <span>Extreme heat above 44°C making work unsafe</span>
+        </div>
+        <div class="coverage-item">
+          <span>🌫️</span>
+          <span>Severe pollution with AQI above 400</span>
+        </div>
+        <div class="coverage-item">
+          <span>🚫</span>
+          <span>Government declared curfews</span>
+        </div>
+        <div class="coverage-item">
+          <span>🛑</span>
+          <span>Local strikes and bandh</span>
+        </div>
+        <div class="coverage-item">
+          <span>⚡</span>
+          <span>Flash floods in delivery zone</span>
+        </div>
+        <p style="color:#27ae60; margin-top:15px; font-size:13px;">
+          ✅ INCOME LOSS ONLY — We cover your lost wages!
+        </p>
+      </div>
+
+      <!-- What We DO NOT Cover -->
+      <div class="not-covered-box">
+        <h3>❌ What We Do NOT Cover</h3>
+        <div class="coverage-item">
+          <span>❌</span>
+          <span>Health or medical expenses</span>
+        </div>
+        <div class="coverage-item">
+          <span>❌</span>
+          <span>Life insurance or death benefits</span>
+        </div>
+        <div class="coverage-item">
+          <span>❌</span>
+          <span>Vehicle damage or repair costs</span>
+        </div>
+        <div class="coverage-item">
+          <span>❌</span>
+          <span>Accident claims or injuries</span>
+        </div>
+        <div class="coverage-item">
+          <span>❌</span>
+          <span>War or military conflicts</span>
+        </div>
+        <div class="coverage-item">
+          <span>❌</span>
+          <span>Pandemics or epidemics</span>
+        </div>
+        <div class="coverage-item">
+          <span>❌</span>
+          <span>Self-caused disruptions</span>
+        </div>
+        <div class="coverage-item">
+          <span>❌</span>
+          <span>Natural death</span>
+        </div>
+        <p style="color:#e74c3c; margin-top:15px; font-size:13px;">
+          ⚠️ We ONLY insure lost income. Nothing else.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Parametric Triggers -->
+  <div class="card">
+    <h2>⚡ Auto-Claim Triggers</h2>
+    <p style="color:#aaa; font-size:13px; margin-bottom:15px;">
+      Claims are automatically triggered when these conditions are met — no paperwork needed!
+    </p>
+    <table class="trigger-table">
+      <tr>
+        <th>Trigger</th>
+        <th>Condition</th>
+        <th>Data Source</th>
+        <th>Status</th>
+      </tr>
+      <tr>
+        <td>🌧️ Heavy Rain</td>
+        <td>Rainfall > 50mm in 6 hours</td>
+        <td>OpenWeatherMap API</td>
+        <td style="color:#27ae60">✅ Active</td>
+      </tr>
+      <tr>
+        <td>🌡️ Extreme Heat</td>
+        <td>Temperature > 44°C</td>
+        <td>OpenWeatherMap API</td>
+        <td style="color:#27ae60">✅ Active</td>
+      </tr>
+      <tr>
+        <td>🌫️ Severe Pollution</td>
+        <td>AQI > 400</td>
+        <td>CPCB Mock API</td>
+        <td style="color:#27ae60">✅ Active</td>
+      </tr>
+      <tr>
+        <td>🌊 Flash Flood</td>
+        <td>Government flood alert</td>
+        <td>Mock Govt API</td>
+        <td style="color:#27ae60">✅ Active</td>
+      </tr>
+      <tr>
+        <td>🚫 Curfew/Strike</td>
+        <td>Official curfew declared</td>
+        <td>Mock News API</td>
+        <td style="color:#27ae60">✅ Active</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- How Claims Work -->
+  <div class="card">
+    <h2>🔄 How Claims Work</h2>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; align-items:center; gap:15px; background:rgba(255,255,255,0.05); padding:12px; border-radius:8px;">
+        <span style="font-size:24px;">1️⃣</span>
+        <div>
+          <p style="color:white; font-weight:bold;">Disruption Detected</p>
+          <p style="color:#aaa; font-size:13px;">System checks weather/AQI every 30 minutes</p>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:15px; background:rgba(255,255,255,0.05); padding:12px; border-radius:8px;">
+        <span style="font-size:24px;">2️⃣</span>
+        <div>
+          <p style="color:white; font-weight:bold;">AI Fraud Check</p>
+          <p style="color:#aaa; font-size:13px;">GPS validation, duplicate check, pattern analysis</p>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:15px; background:rgba(255,255,255,0.05); padding:12px; border-radius:8px;">
+        <span style="font-size:24px;">3️⃣</span>
+        <div>
+          <p style="color:white; font-weight:bold;">Instant Payout</p>
+          <p style="color:#aaa; font-size:13px;">Money sent to your UPI within 2 minutes — no forms!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav-links">
+    <a href="/dashboard">🏠 Dashboard</a>
+    <a href="/claims">🔔 Claims</a>
+    <a href="/financial">💰 Financial</a>
+    <a href="/logout" class="red">🚪 Logout</a>
+  </div>
+
+</div>
 </body>
 </html>
