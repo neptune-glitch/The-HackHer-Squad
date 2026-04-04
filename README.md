@@ -189,7 +189,7 @@ Guidewire DEVTrails 2026
 
 ---
 
-## Team Maembers 
+## Team Members 
 1. Bharti Pathak 
 2. Supriya Verma 
 3. Sanjoli Singh  
