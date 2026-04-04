@@ -31,7 +31,7 @@ def get_delhi_weather(city="Delhi"):
         "Ahmedabad": "Ahmedabad",
         "Jaipur": "Jaipur",
         "Lucknow": "Lucknow",
-        "Noida": "Noida",
+        "Noida": "Delhi",
         "Delhi": "Delhi"
     }
 
@@ -102,7 +102,7 @@ def calculate_risk_score(zone, rainfall, temp):
 
     return score
 
-# ---------------- PREMIUM ----------------
+# premium calculator
 def calculate_premium(risk_score, plan):
     if "Basic" in plan:
         base = 25
