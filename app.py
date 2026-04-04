@@ -317,6 +317,70 @@ def dashboard():
         claim_triggered=claim_triggered,
         disruption_type=disruption_type
     )
+@app.route('/claims')
+def claims():
+    if 'worker_id' not in session:
+        return redirect('/login')
+
+    conn = sqlite3.connect('helix.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM claims WHERE worker_id=?', (session['worker_id'],))
+    claim_history = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM workers WHERE id=?', (session['worker_id'],))
+    worker = cursor.fetchone()
+
+    conn.close()
+
+    weather = get_delhi_weather(worker[3])
+
+    return render_template('claims.html',
+        claim_history=claim_history,
+        worker=worker,
+        weather=weather
+    )
+
+@app.route('/policy')
+def policy():
+    if 'worker_id' not in session:
+        return redirect('/login')
+
+    conn = sqlite3.connect('helix.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM workers WHERE id=?', (session['worker_id'],))
+    worker = cursor.fetchone()
+
+    conn.close()
+
+    return render_template('policy.html', worker=worker)
+
+@app.route('/financial')
+def financial():
+    if 'worker_id' not in session:
+        return redirect('/login')
+
+    conn = sqlite3.connect('helix.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT COUNT(*) FROM workers')
+    total_workers = cursor.fetchone()[0]
+
+    conn.close()
+
+    weekly_premium = total_workers * 40
+    expected_claims = total_workers // 10
+    total_payouts = expected_claims * 500
+    profit = weekly_premium - total_payouts
+
+    return render_template('financial.html',
+        total_workers=total_workers,
+        weekly_premium=weekly_premium,
+        expected_claims=expected_claims,
+        total_payouts=total_payouts,
+        profit=profit
+    )
 
 # RUN
 if __name__ == '__main__':
