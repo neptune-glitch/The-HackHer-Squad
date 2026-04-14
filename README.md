@@ -144,11 +144,12 @@ Helix goes beyond automation → provides **decision-support intelligence**
 
 ## 🛠️ Tech Stack
 
-- Frontend: HTML + CSS + Tailwind  
-- Backend: Flask (Python)  
-- Database: SQLite  
-- APIs: OpenWeatherMap  
-- Payments: Razorpay (test)  
+- HTML + CSS  
+- Python + Flask  
+- SQLite  
+- OpenWeatherMap API  
+- Flask Sessions  
+- Rule-based AI scoring  
 
 ---
 

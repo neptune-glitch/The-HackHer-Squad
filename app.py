@@ -123,15 +123,69 @@ def calculate_premium(risk_score, plan):
 def fraud_detection(worker_id):
     conn = sqlite3.connect('helix.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT COUNT(*) FROM claims WHERE worker_id=?', (worker_id,))
-    count = cursor.fetchone()[0]
+    
+    from datetime import date
+    today = str(date.today())
+    
+    # Check 1 - Total claims ever
+    cursor.execute(
+        'SELECT COUNT(*) FROM claims WHERE worker_id=?',
+        (worker_id,)
+    )
+    total_claims = cursor.fetchone()[0]
+    
+    # Check 2 - Claims today
+    cursor.execute('''
+        SELECT COUNT(*) FROM claims 
+        WHERE worker_id=? AND date=?
+    ''', (worker_id, today))
+    today_claims = cursor.fetchone()[0]
+    
+    # Check 3 - Claims this week
+    cursor.execute('''
+        SELECT COUNT(*) FROM claims 
+        WHERE worker_id=? 
+        AND date >= date('now', '-7 days')
+    ''', (worker_id,))
+    week_claims = cursor.fetchone()[0]
+    
     conn.close()
-
-    if count > 4:
-        return "REJECTED ❌", 50
-    elif count > 2:
-        return "UNDER REVIEW 🔍", 25
-    return "APPROVED ✅", 0
+    
+    fraud_score = 0
+    reasons = []
+    
+    # Frequency analysis
+    if total_claims > 4:
+        fraud_score += 40
+        reasons.append("High claim frequency ⚠️")
+    elif total_claims > 2:
+        fraud_score += 20
+        reasons.append("Moderate claim frequency 🔍")
+    else:
+        reasons.append("Normal claim frequency ✅")
+    
+    # Same day check
+    if today_claims > 1:
+        fraud_score += 40
+        reasons.append("Multiple claims today ⚠️")
+    else:
+        reasons.append("No duplicate claims today ✅")
+    
+    # Weekly pattern
+    if week_claims > 3:
+        fraud_score += 20
+        reasons.append("Suspicious weekly pattern ⚠️")
+    else:
+        reasons.append("Normal weekly pattern ✅")
+    
+    # Location check (mock)
+    reasons.append("Location verified ✅")
+    
+    if fraud_score >= 60:
+        return "REJECTED ❌", fraud_score, reasons
+    elif fraud_score >= 30:
+        return "UNDER REVIEW 🔍", fraud_score, reasons
+    return "APPROVED ✅", fraud_score, reasons
 
 # ---------------- DB ----------------
 def create_database():
@@ -298,8 +352,7 @@ def dashboard():
         disruption_type = "Extreme Heat"
 
     # FRAUD
-    fraud_status, fraud_score = fraud_detection(session['worker_id'])
-
+    fraud_status, fraud_score, fraud_reasons = fraud_detection(session['worker_id'])
     return render_template('dashboard.html',
         worker=worker,
         weather=weather,
@@ -308,6 +361,7 @@ def dashboard():
         premium=premium,
         fraud_status=fraud_status,
         fraud_score=fraud_score,
+        fraud_reasons=fraud_reasons,
         prediction_confidence=prediction_confidence,
         prediction_message=prediction_message,
         best_time=best_time,
@@ -334,11 +388,27 @@ def claims():
     conn.close()
 
     weather = get_delhi_weather(worker[3])
+    fraud_status, fraud_score, fraud_reasons = fraud_detection(session['worker_id'])
+
+    claim_triggered = False
+    disruption_type = ""
+
+    if weather['rainfall'] > 50:
+        claim_triggered = True
+        disruption_type = "Heavy Rain"
+    elif weather['temp'] > 44:
+        claim_triggered = True
+        disruption_type = "Extreme Heat"
 
     return render_template('claims.html',
         claim_history=claim_history,
         worker=worker,
-        weather=weather
+        weather=weather,
+        fraud_status=fraud_status,
+        fraud_score=fraud_score,
+        fraud_reasons=fraud_reasons,
+        claim_triggered=claim_triggered,
+        disruption_type=disruption_type
     )
 
 @app.route('/policy')
@@ -380,6 +450,96 @@ def financial():
         expected_claims=expected_claims,
         total_payouts=total_payouts,
         profit=profit
+    )
+
+# PAYOUT
+@app.route('/payout')
+def payout():
+    if 'worker_id' not in session:
+        return redirect('/login')
+    
+    conn = sqlite3.connect('helix.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        'SELECT * FROM workers WHERE id=?',
+        (session['worker_id'],)
+    )
+    worker = cursor.fetchone()
+    conn.close()
+    
+    weather = get_delhi_weather(worker[3])
+    
+    disruption_type = ""
+    if weather['rainfall'] > 50:
+        disruption_type = "Heavy Rain/Flood 🌧️"
+    elif weather['temp'] > 44:
+        disruption_type = "Extreme Heat 🌡️"
+    else:
+        disruption_type = "Manual Request"
+    
+    return render_template('payout.html',
+        worker=worker,
+        disruption_type=disruption_type
+    )
+
+# ADMIN DASHBOARD
+@app.route('/admin')
+def admin():
+    conn = sqlite3.connect('helix.db')
+    cursor = conn.cursor()
+    
+    # Stats
+    cursor.execute('SELECT COUNT(*) FROM workers')
+    total_workers = cursor.fetchone()[0]
+    
+    cursor.execute('SELECT COUNT(*) FROM claims')
+    total_claims = cursor.fetchone()[0]
+    
+    cursor.execute(
+        "SELECT COUNT(*) FROM claims WHERE status LIKE '%APPROVED%'"
+    )
+    approved_claims = cursor.fetchone()[0]
+    
+    # All data
+    cursor.execute('SELECT * FROM workers')
+    all_workers = cursor.fetchall()
+    
+    cursor.execute('SELECT * FROM claims ORDER BY id DESC')
+    all_claims = cursor.fetchall()
+    
+    conn.close()
+    
+    # Financial
+    weekly_premium = total_workers * 40
+    total_payouts = approved_claims * 500
+    profit = weekly_premium - total_payouts
+    
+    if weekly_premium > 0:
+        loss_ratio = round(total_payouts / weekly_premium * 100, 1)
+    else:
+        loss_ratio = 0
+    
+    # Next week prediction
+    weather = get_delhi_weather()
+    if weather['temp'] > 42:
+        next_week_risk = "HIGH 🔴 — Heat wave likely"
+    elif weather['rainfall'] > 20:
+        next_week_risk = "MEDIUM 🟡 — Rain expected"
+    else:
+        next_week_risk = "LOW 🟢 — Normal conditions"
+    
+    return render_template('admin.html',
+        total_workers=total_workers,
+        total_claims=total_claims,
+        approved_claims=approved_claims,
+        all_workers=all_workers,
+        all_claims=all_claims,
+        weekly_premium=weekly_premium,
+        total_payouts=total_payouts,
+        profit=profit,
+        loss_ratio=loss_ratio,
+        next_week_risk=next_week_risk,
+        weather=weather
     )
 
 # RUN
