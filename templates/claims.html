@@ -10,125 +10,125 @@
     body {
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       min-height: 100vh;
+      margin: 0;
     }
   </style>
 </head>
 
-<body>
+<body class="flex flex-col items-center justify-start py-10 px-4">
 
-<div class="max-w-2xl mx-auto p-4 pt-8 text-white">
+  <header class="mb-8 text-center">
+    <h1 class="text-5xl font-extrabold text-white tracking-widest uppercase">
+      HELIX <span class="text-cyan-400">CORE</span>
+    </h1>
+    <p class="text-cyan-200 opacity-70">Parametric Insurance Protocol</p>
+  </header>
 
-  <h1 class="text-2xl font-bold text-center text-cyan-400 mb-6">
-    🔔 Claims Dashboard
-  </h1>
+  <div class="max-w-2xl w-full text-white">
 
-  <!-- Policy Status -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
-    <p class="text-gray-300">Policy Status</p>
-    <p class="text-green-400 font-bold text-lg">Active ✅</p>
-  </div>
+    <h1 class="text-2xl font-bold text-center text-cyan-400 mb-6">
+      🔔 Claims Dashboard
+    </h1>
 
-  <!-- Fraud Check -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-2">Fraud Check</h2>
-    <p class="font-bold">{{ fraud_status }}</p>
-
-    <!-- Reasons -->
-    <ul class="mt-2 text-sm text-gray-300 list-disc pl-5">
-      <li>GPS location: verified ✅</li>
-      <li>Claim frequency: normal ✅</li>
-      <li>Multiple claims same day: ❌ (flagged)</li>
-    </ul>
-  </div>
-
-  <!-- Auto Trigger Status -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-2">Auto-Trigger Status</h2>
-
-    <p><strong>AQI:</strong> {{ aqi or "N/A" }}</p>
-    <p><strong>Temperature:</strong> {{ temp or "N/A" }}</p>
-
-    <p class="mt-2">
-      AQI > 400:
-      <span class="text-green-400 font-bold">
-        {{ "✅ Triggered" if claim_triggered else "❌ Not Triggered" }}
-      </span>
-    </p>
-  </div>
-
-  <!-- Claim Trigger -->
-  {% if claim_triggered %}
-  <div class="bg-yellow-500 bg-opacity-20 border border-yellow-400 rounded-2xl shadow p-4 mb-4">
-    <h2 class="font-semibold text-lg mb-1 text-yellow-300">
-      ⚠️ Claim Auto-Triggered!
-    </h2>
-    <p><strong>Reason:</strong> {{ disruption_type }}</p>
-    <p class="text-green-400 font-bold mt-2">
-      ₹500 will be credited to your UPI
-    </p>
-  </div>
-  {% endif %}
-
-  <!-- Claim History TABLE -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-3">Claim History</h2>
-
-    {% if claim_history %}
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm text-center border border-gray-600">
-        <thead class="bg-gray-700">
-          <tr>
-            <th class="p-2">ID</th>
-            <th class="p-2">Date</th>
-            <th class="p-2">Type</th>
-            <th class="p-2">Amount</th>
-            <th class="p-2">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for claim in claim_history %}
-          <tr class="border-t border-gray-600">
-            <td class="p-2">#{{ claim[0] }}</td>
-            <td class="p-2">{{ claim[5] }}</td>
-            <td class="p-2">{{ claim[2] }}</td>
-            <td class="p-2">₹{{ claim[3] }}</td>
-            <td class="p-2 text-green-400">{{ claim[4] }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
+      <p class="text-gray-300">Policy Status</p>
+      <p class="text-green-400 font-bold text-lg">Active ✅</p>
     </div>
-    {% else %}
-      <p class="text-gray-400">No claims yet.</p>
+
+    <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
+      <h2 class="text-lg font-semibold text-cyan-300 mb-2">Fraud Check</h2>
+      <p class="font-bold text-red-400">{{ fraud_status or "Review Required" }}</p>
+
+      <ul class="mt-2 text-sm text-gray-300 list-disc pl-5">
+        <li>GPS location: verified ✅</li>
+        <li>Claim frequency: normal ✅</li>
+        <li>Multiple claims same day: ❌ (flagged)</li>
+      </ul>
+    </div>
+
+    <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
+      <h2 class="text-lg font-semibold text-cyan-300 mb-2">Auto-Trigger Status</h2>
+
+      <p><strong>AQI:</strong> {{ aqi or "N/A" }}</p>
+      <p><strong>Temperature:</strong> {{ temp or "N/A" }}</p>
+
+      <p class="mt-2">
+        AQI > 400:
+        <span class="text-green-400 font-bold">
+          {{ "✅ Triggered" if claim_triggered else "❌ Not Triggered" }}
+        </span>
+      </p>
+    </div>
+
+    {% if claim_triggered %}
+    <div class="bg-yellow-500 bg-opacity-20 border border-yellow-400 rounded-2xl shadow p-4 mb-4">
+      <h2 class="font-semibold text-lg mb-1 text-yellow-300">
+        ⚠️ Claim Auto-Triggered!
+      </h2>
+      <p><strong>Reason:</strong> {{ disruption_type }}</p>
+      <p class="text-green-400 font-bold mt-2">
+        ₹500 will be credited to your UPI
+      </p>
+    </div>
     {% endif %}
+
+    <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
+      <h2 class="text-lg font-semibold text-cyan-300 mb-3">Claim History</h2>
+
+      {% if claim_history %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-center border border-gray-600">
+          <thead class="bg-gray-700">
+            <tr>
+              <th class="p-2">ID</th>
+              <th class="p-2">Date</th>
+              <th class="p-2">Type</th>
+              <th class="p-2">Amount</th>
+              <th class="p-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for claim in claim_history %}
+            <tr class="border-t border-gray-600">
+              <td class="p-2">#{{ claim[0] }}</td>
+              <td class="p-2">{{ claim[5] }}</td>
+              <td class="p-2">{{ claim[2] }}</td>
+              <td class="p-2">₹{{ claim[3] }}</td>
+              <td class="p-2 text-green-400">{{ claim[4] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p class="text-gray-400">No claims yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-center">
+      <h2 class="text-lg font-semibold text-cyan-300 mb-3">Payout</h2>
+
+      <button onclick="simulatePayout()"
+        class="bg-cyan-500 hover:bg-cyan-600 px-6 py-2 rounded-xl transition-all duration-300 transform hover:scale-105">
+        Process Payout (₹500)
+      </button>
+
+      <p id="payout-message" class="mt-3 text-green-400 font-semibold"></p>
+    </div>
+
+    <a href="/dashboard"
+       class="block text-center bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-xl mt-4 border border-cyan-500/30">
+      ← Back to Dashboard
+    </a>
+
   </div>
 
-  <!-- Payout Section -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-center">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-3">Payout</h2>
-
-    <button onclick="simulatePayout()"
-      class="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-xl">
-      Process Payout (₹500)
-    </button>
-
-    <p id="payout-message" class="mt-3 text-green-400 font-semibold"></p>
-  </div>
-
-  <!-- Back -->
-  <a href="/dashboard"
-     class="block text-center bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-xl mt-4">
-    ← Back to Dashboard
-  </a>
-
-</div>
-
-<script>
-  function simulatePayout() {
-    document.getElementById("payout-message").innerText =
-      "✅ Payout of ₹500 processed successfully!";
-  }
-</script>
+  <script>
+    function simulatePayout() {
+      document.getElementById("payout-message").innerText =
+        "✅ Payout of ₹500 processed successfully!";
+    }
+  </script>
 
 </body>
 </html>
