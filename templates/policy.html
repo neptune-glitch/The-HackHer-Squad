@@ -2,31 +2,36 @@
 <html>
 <head>
   <title>Policy - Helix</title>
-  <link rel="stylesheet" href="/static/homestyle.css">
 
   <style>
     body {
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: white;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
     }
 
     .policy-container {
+      width: 100%;
       max-width: 900px;
-      margin: 30px auto;
-      padding: 20px;
     }
 
     .card {
       background: rgba(255,255,255,0.08);
       padding: 25px;
-      margin: 15px 0;
-      border-radius: 12px;
-      backdrop-filter: blur(8px);
+      margin-bottom: 20px;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
     }
 
     .card h2 {
       color: #00aaff;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
 
     .plan-grid {
@@ -36,8 +41,8 @@
     }
 
     .plan-card {
-      border-radius: 12px;
       padding: 20px;
+      border-radius: 12px;
       text-align: center;
     }
 
@@ -46,37 +51,34 @@
     .plan-premium { border: 2px solid #8e44ad; }
 
     .plan-price {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: bold;
-    }
-
-    .trigger-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .trigger-table th, .trigger-table td {
-      padding: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      text-align: center;
     }
 
     .nav-links {
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
       margin-top: 20px;
     }
 
     .nav-links a {
       background: #00aaff;
       color: white;
-      padding: 10px 18px;
+      padding: 10px 20px;
       border-radius: 8px;
       text-decoration: none;
     }
 
-    .nav-links a.red { background: #e74c3c; }
+    .nav-links a.red {
+      background: #e74c3c;
+    }
+
+    @media (max-width: 600px) {
+      .plan-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
@@ -86,31 +88,27 @@
 
   <!-- USER POLICY -->
   <div class="card">
-    <h2>📋 Your Active Policy</h2>
-    <p>👤 {{ worker[1] }}</p>
-    <p>📍 {{ worker[3] }}</p>
-    <p>💳 {{ worker[4] }}</p>
-    <p>🎫 <strong>{{ worker[6] }}</strong></p>
-    <p style="color:#27ae60;">✅ ACTIVE</p>
+    <h2>Your Policy</h2>
+    <p>Name: {{ worker[1] }}</p>
+    <p>Zone: {{ worker[3] }}</p>
+    <p>UPI: {{ worker[4] }}</p>
+    <p>Plan: <strong>{{ worker[6] }}</strong></p>
+    <p style="color:#27ae60;">Active ✅</p>
   </div>
 
-  <!-- WHY POLICY -->
+  <!-- WHY -->
   <div class="card">
-    <h2>💡 Why This Policy Matters</h2>
-
-    <p style="color:#aaa;">Protects your daily income using AI + real-time data</p>
-
-    <p>💸 Income Protection</p>
-    <p>⚡ Instant UPI payouts</p>
-    <p>🤖 AI-based risk system</p>
+    <h2>Why This Policy?</h2>
+    <p> Protects your income</p>
+    <p> Instant payouts</p>
+    <p> AI-based risk detection</p>
   </div>
 
   <!-- PLANS -->
   <div class="card">
-    <h2>💰 Available Plans</h2>
+    <h2>Available Plans</h2>
 
     <div class="plan-grid">
-
       <div class="plan-card plan-basic">
         <h3>Basic</h3>
         <p class="plan-price">₹25/week</p>
@@ -128,90 +126,43 @@
         <p class="plan-price">₹60/week</p>
         <p>₹700/day</p>
       </div>
-
     </div>
   </div>
 
-  <!-- AI RECOMMENDATION -->
-  <div class="card">
-    <h2>🤖 AI Recommendation</h2>
+  <!-- ✅ FIXED AI RECOMMENDATION -->
+  <div class="card" style="text-align:center;">
+    <h2>AI Recommendation</h2>
 
-    {% if worker[3]|lower in ['delhi','mumbai'] %}
-      <p style="color:#f39c12;">Standard Plan Recommended</p>
+    {% set zone = worker[3].lower() %}
+
+    {% if 'dwarka' in zone or 'mumbai' in zone %}
+      <p style="color:#e74c3c; font-size:1.2rem; font-weight:bold;">
+        Premium Plan Recommended 🚀
+      </p>
+
+    {% elif 'lajpat' in zone or 'kolkata' in zone %}
+      <p style="color:#f39c12; font-size:1.2rem; font-weight:bold;">
+        Standard Plan Recommended ⭐
+      </p>
+
+    {% elif 'rohini' in zone or 'chennai' in zone %}
+      <p style="color:#00aaff; font-size:1.2rem; font-weight:bold;">
+        Standard Plan Recommended ⭐
+      </p>
+
     {% else %}
-      <p style="color:#27ae60;">Basic Plan Recommended</p>
+      <p style="color:#27ae60; font-size:1.2rem; font-weight:bold;">
+        Basic Plan Recommended ✅
+      </p>
     {% endif %}
-  </div>
 
-  <!-- PLAN COMPARISON -->
-  <div class="card">
-    <h2>📊 Plan Comparison</h2>
-
-    <table class="trigger-table">
-      <tr>
-        <th>Plan</th>
-        <th>Cost</th>
-        <th>Payout</th>
-      </tr>
-      <tr>
-        <td>Basic</td>
-        <td>₹25</td>
-        <td>₹300</td>
-      </tr>
-      <tr>
-        <td>Standard</td>
-        <td>₹40</td>
-        <td>₹500</td>
-      </tr>
-      <tr>
-        <td>Premium</td>
-        <td>₹60</td>
-        <td>₹700</td>
-      </tr>
-    </table>
   </div>
 
   <!-- TRIGGERS -->
   <div class="card">
-    <h2>⚡ Auto Claim Triggers</h2>
-
-    <table class="trigger-table">
-      <tr>
-        <th>Trigger</th>
-        <th>Condition</th>
-      </tr>
-      <tr>
-        <td>🌧️ Rain</td>
-        <td>>50mm</td>
-      </tr>
-      <tr>
-        <td>🌡️ Heat</td>
-        <td>>44°C</td>
-      </tr>
-      <tr>
-        <td>🌫️ AQI</td>
-        <td>>400</td>
-      </tr>
-    </table>
-  </div>
-
-  <!-- HOW CLAIM WORKS -->
-  <div class="card">
-    <h2>🔄 How Claims Work</h2>
-
-    <p>1️⃣ Disruption detected</p>
-    <p>2️⃣ Fraud check</p>
-    <p>3️⃣ Instant payout</p>
-  </div>
-
-  <!-- WHY HELIX -->
-  <div class="card">
-    <h2>🚀 Why Helix</h2>
-
-    <p>✅ No paperwork</p>
-    <p>✅ Real-time triggers</p>
-    <p>✅ AI fraud detection</p>
-    <p>✅ Instant UPI payouts</p>
+    <h2>Auto Claim Triggers</h2>
+    <p>🌧️ Rain > 50mm</p>
+    <p>🌡️ Temperature > 44°C</p>
   </div>
 
   <!-- NAV -->
