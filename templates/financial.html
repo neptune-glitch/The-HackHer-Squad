@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Helix - Financial Overview</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     body {
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
@@ -15,42 +16,101 @@
 
 <body>
 
-<div class="max-w-md mx-auto p-4 pt-8">
+<div class="max-w-md mx-auto p-4 pt-8 text-white">
 
   <h1 class="text-2xl font-bold text-center text-cyan-400 mb-6">💰 Financial Model</h1>
 
-  <!-- Total Workers -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
-    <h2 class="font-semibold text-lg text-cyan-300">Total Workers Enrolled</h2>
-    <p class="text-3xl font-bold">{{ total_workers }}</p>
+  <!-- USER BENEFITS -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
+    <h2 class="text-cyan-300 font-semibold">Your Monthly Snapshot</h2>
+    <p>💼 Earnings: ₹18,000</p>
+    <p class="text-green-400">🛡️ Loss Prevented: ₹3,000</p>
+    <p>💳 Premium Paid: ₹160</p>
+    <p class="text-blue-400 font-bold">📈 Net Benefit: +₹2,840</p>
   </div>
 
-  <!-- Weekly Premium -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
-    <h2 class="font-semibold text-lg text-cyan-300">Weekly Premium Collected</h2>
-    <p class="text-3xl font-bold text-green-400">₹{{ weekly_premium }}</p>
+  <!-- PLATFORM STATS -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
+    <h2 class="text-cyan-300 font-semibold">Platform Overview</h2>
+    <p>Total Workers: <strong>{{ total_workers }}</strong></p>
+    <p class="text-green-400">Weekly Premium: ₹{{ weekly_premium }}</p>
+    <p>Expected Claims: {{ expected_claims }}</p>
+    <p class="text-red-400">Payouts: ₹{{ total_payouts }}</p>
+    <p class="text-green-400 font-bold">Profit: ₹{{ profit }}</p>
   </div>
 
-  <!-- Expected Claims -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
-    <h2 class="font-semibold text-lg text-cyan-300">Expected Claims / Week</h2>
-    <p class="text-3xl font-bold">{{ expected_claims }}</p>
+  <!-- MONTHLY PERFORMANCE TABLE -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
+    <h2 class="text-cyan-300 font-semibold mb-2">📊 Monthly Performance</h2>
+
+    <table class="w-full text-sm text-center border border-gray-600">
+      <thead class="bg-gray-700">
+        <tr>
+          <th class="p-2">Month</th>
+          <th class="p-2">Premium</th>
+          <th class="p-2">Claims</th>
+          <th class="p-2">P/L</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-t border-gray-600">
+          <td class="p-2">April</td>
+          <td class="p-2">₹50,000</td>
+          <td class="p-2">₹35,000</td>
+          <td class="p-2 text-green-400">+₹15,000</td>
+        </tr>
+        <tr class="border-t border-gray-600">
+          <td class="p-2">May</td>
+          <td class="p-2">₹52,000</td>
+          <td class="p-2">₹48,000</td>
+          <td class="p-2 text-green-400">+₹4,000</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-  <!-- Total Payouts -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
-    <h2 class="font-semibold text-lg text-cyan-300">Total Payouts / Week</h2>
-    <p class="text-3xl font-bold text-red-400">₹{{ total_payouts }}</p>
+  <!-- LOSS RATIO -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
+    <h2 class="text-cyan-300 font-semibold">📉 Loss Ratio</h2>
+    <p>Formula: (Claims / Premium) × 100</p>
+
+    {% if weekly_premium > 0 %}
+      {% set ratio = (total_payouts / weekly_premium * 100) | round(1) %}
+      <p class="mt-2 font-bold 
+        {% if ratio < 80 %} text-green-400 
+        {% elif ratio < 100 %} text-yellow-400 
+        {% else %} text-red-400 {% endif %}">
+        {{ ratio }}%
+      </p>
+    {% else %}
+      <p>No data</p>
+    {% endif %}
   </div>
 
-  <!-- Weekly Profit -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4 text-white">
-    <h2 class="font-semibold text-lg text-cyan-300">Weekly Profit</h2>
-    <p class="text-3xl font-bold text-green-400">₹{{ profit }}</p>
+  <!-- SUSTAINABILITY -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
+    <h2 class="text-cyan-300 font-semibold">📈 Sustainability</h2>
+    <ul class="list-disc pl-5 text-sm text-gray-300">
+      <li>Break-even at ~70% loss ratio</li>
+      <li>Reserve fund needed: ₹2–3 lakh</li>
+      <li>Expected growth: 8–12% monthly</li>
+    </ul>
   </div>
 
-  <!-- Back Button -->
-  <a href="/dashboard" class="block text-center bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-xl mt-4">
+  <!-- PRICING MODEL -->
+  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
+    <h2 class="text-cyan-300 font-semibold">💡 Weekly Pricing Model</h2>
+    <p>₹49 – ₹99 per week</p>
+    <ul class="list-disc pl-5 text-sm text-gray-300">
+      <li>Fits gig workers income cycle</li>
+      <li>Lower upfront cost</li>
+      <li>Higher retention</li>
+    </ul>
+  </div>
+
+  <!-- BACK -->
+  <a href="/dashboard"
+     class="block text-center bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-xl mt-4">
     ← Back to Dashboard
   </a>
 

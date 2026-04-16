@@ -1,0 +1,49 @@
+<div class="card">
+  <h2>👷 Total Workers ({{ total_workers }})</h2>
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Zone</th>
+    </tr>
+
+    {% for w in all_workers %}
+    <tr>
+      <td>{{ w[1] }}</td>
+      <td>{{ w[3] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="card">
+  <h2>📄 Claims</h2>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Worker ID</th>
+      <th>Type</th>
+      <th>Status</th>
+    </tr>
+
+    {% for c in all_claims %}
+    <tr>
+      <td>#{{ c[0] }}</td>
+      <td>{{ c[1] }}</td>
+      <td>{{ c[2] }}</td>
+      <td class="green">{{ c[4] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="card">
+  <h2>💰 Weekly Finance</h2>
+  <p>Premium Collected: ₹{{ weekly_premium }}</p>
+  <p>Payouts: ₹{{ total_payouts }}</p>
+  <h3>Profit: ₹{{ profit }}</h3>
+</div>
+
+<div class="card">
+  <h2>📊 Risk Prediction</h2>
+  <p>{{ next_week_risk }}</p>
+</div>

@@ -312,9 +312,47 @@ def dashboard():
     conn.close()
 
     weather = get_delhi_weather(worker[3])
+    risk_score = calculate_risk_score(worker[3], weather['rainfall'], weather['temp'])
 
     # RISK
-    risk_score = calculate_risk_score(worker[3], weather['rainfall'], weather['temp'])
+    
+    zone_score = 0
+    zone_lower = worker[3].lower()
+
+    if "dwarka" in zone_lower or "mumbai" in zone_lower:
+        zone_score = 30
+    elif "lajpat" in zone_lower or "kolkata" in zone_lower:
+        zone_score = 25
+    elif "rohini" in zone_lower or "chennai" in zone_lower:
+        zone_score = 20
+    else:
+        zone_score = 10
+
+# Season score
+    month = datetime.now().month
+
+    if month in [7, 8, 9]:
+        season_score = 30
+        season_name = "Monsoon 🌧️"
+    elif month in [4, 5, 6]:
+        season_score = 20
+        season_name = "Summer 🌡️"
+    elif month in [11, 12, 1]:
+        season_score = 25
+        season_name = "Winter ❄️"
+    else:
+        season_score = 10
+        season_name = "Normal 🌤️"
+
+# Weather score
+    if weather['rainfall'] > 50:
+        weather_score = 40
+    elif weather['temp'] > 44:
+        weather_score = 35
+    elif weather['temp'] > 40:
+        weather_score = 20
+    else:
+        weather_score = 5
     risk_level = "HIGH 🔴" if risk_score >= 70 else "MEDIUM 🟡" if risk_score >= 40 else "LOW 🟢"
     premium = calculate_premium(risk_score, worker[6])
 
@@ -539,7 +577,12 @@ def admin():
         profit=profit,
         loss_ratio=loss_ratio,
         next_week_risk=next_week_risk,
-        weather=weather
+        weather=weather,
+        zone_score=zone_score,
+        season_score=season_score,
+        weather_score=weather_score,
+        season_name=season_name
+ 
     )
 
 # RUN

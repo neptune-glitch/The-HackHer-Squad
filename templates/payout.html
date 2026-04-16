@@ -1,0 +1,26 @@
+<div class="card">
+
+  <div id="loading">
+    <div class="loader"></div>
+    <p>Processing Payment for {{ disruption_type }}...</p>
+  </div>
+
+  <div id="success" style="display:none;">
+    <h2>✅ Payment Successful</h2>
+    <p>Worker: {{ worker[1] }}</p>
+    <p>Amount: ₹500</p>
+    <p>Transaction ID: <span id="txn"></span></p>
+  </div>
+
+</div>
+
+<script>
+setTimeout(()=>{
+  document.getElementById("loading").style.display="none";
+  document.getElementById("success").style.display="block";
+
+  let txn = "TXN" + Math.floor(Math.random()*1000000);
+  document.getElementById("txn").innerText = txn;
+
+},3000);
+</script>
