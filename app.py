@@ -6,11 +6,24 @@ from dotenv import load_dotenv
 from datetime import datetime
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "fallback_secret")
+app.config["ADMIN_USERNAME"] = os.getenv("ADMIN_USERNAME", "admin")
+app.config["ADMIN_PASSWORD"] = os.getenv("ADMIN_PASSWORD")
+app.config["DATABASE_PATH"] = os.getenv(
+    "DATABASE_PATH",
+    os.path.join(app.instance_path, "helix.db")
+)
+
+def get_db_connection():
+    db_dir = os.path.dirname(app.config["DATABASE_PATH"])
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+    return sqlite3.connect(app.config["DATABASE_PATH"])
 
 # ─── RANDOM FOREST MODEL 1 — Login Anomaly ────────────────
 def train_login_model():
@@ -100,12 +113,12 @@ def train_fraud_model():
     return model
 
 # Train all models at startup
-print("🤖 Training Random Forest models...")
+print("Training Random Forest models...")
 rf_login_model   = train_login_model()
 rf_risk_model    = train_risk_model()
 rf_premium_model = train_premium_model()
 rf_fraud_model   = train_fraud_model()
-print("✅ All 4 Random Forest models trained!")
+print("All 4 Random Forest models trained.")
 
 # ─── WEATHER ──────────────────────────────────────────────
 def get_delhi_weather(city="Delhi"):
@@ -154,7 +167,7 @@ def get_delhi_weather(city="Delhi"):
             'description': data['weather'][0]['description'],
             'city': data['name']
         }
-    except:
+    except (requests.RequestException, ValueError, KeyError, TypeError):
         return default_weather(city_name)
 
 def default_weather(city="Delhi"):
@@ -205,7 +218,7 @@ def calculate_premium(zone_score, season_score, weather_score, plan):
 # ─── RF FRAUD DETECTION ───────────────────────────────────
 def fraud_detection(worker_id):
     from datetime import date
-    conn = sqlite3.connect('helix.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     today = str(date.today())
 
@@ -250,7 +263,7 @@ def fraud_detection(worker_id):
 
 # ─── DATABASE ─────────────────────────────────────────────
 def create_database():
-    conn = sqlite3.connect('helix.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS workers (
         id INTEGER PRIMARY KEY, name TEXT, phone TEXT,
@@ -261,6 +274,29 @@ def create_database():
     conn.commit()
     conn.close()
 
+def verify_password(stored_password, provided_password):
+    if not stored_password:
+        return False
+    if stored_password.startswith(("pbkdf2:", "scrypt:")):
+        return check_password_hash(stored_password, provided_password)
+    return stored_password == provided_password
+
+def ensure_password_hash(worker_id, stored_password):
+    if not stored_password or stored_password.startswith(("pbkdf2:", "scrypt:")):
+        return
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        'UPDATE workers SET password=? WHERE id=?',
+        (generate_password_hash(stored_password), worker_id)
+    )
+    conn.commit()
+    conn.close()
+
+def admin_is_configured():
+    return bool(app.config["ADMIN_PASSWORD"])
+
 # ─── HOME ─────────────────────────────────────────────────
 @app.route('/')
 def home():
@@ -270,7 +306,7 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        conn = sqlite3.connect('helix.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('''INSERT INTO workers 
             (name, phone, zone, upi_id, platform, plan, password)
@@ -278,7 +314,7 @@ def register():
             request.form['name'], request.form['phone'],
             request.form['zone'], request.form['upi'],
             request.form['platform'], request.form['plan'],
-            request.form['password']
+            generate_password_hash(request.form['password'])
         ))
         conn.commit()
         conn.close()
@@ -292,38 +328,64 @@ def login():
         phone = request.form['phone']
         password = request.form['password']
 
-        conn = sqlite3.connect('helix.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            'SELECT * FROM workers WHERE phone=? AND password=?',
-            (phone, password)
+            'SELECT * FROM workers WHERE phone=?',
+            (phone,)
         )
         worker = cursor.fetchone()
         conn.close()
 
-        if not worker:
+        failed_attempts = session.get('failed_login_attempts', 0)
+        if not worker or not verify_password(worker[7], password):
+            session['failed_login_attempts'] = failed_attempts + 1
             return "Invalid login"
+
+        ensure_password_hash(worker[0], worker[7])
 
         # RF Login Anomaly Check
         login_hour = datetime.now().hour
         is_night = 1 if login_hour < 6 or login_hour > 22 else 0
-        session['login_attempts'] = session.get('login_attempts', 0) + 1
-        attempts = session['login_attempts']
+        attempts = max(1, failed_attempts)
 
         features = np.array([[login_hour, is_night, attempts]])
         prediction = rf_login_model.predict(features)[0]
         confidence = int(max(rf_login_model.predict_proba(features)[0]) * 100)
 
-        if prediction == 1:
+        if prediction == 1 and failed_attempts >= 3:
             return f"⚠️ Suspicious login detected ({confidence}% risk). Try again later."
 
         session['worker_id'] = worker[0]
-        session['login_attempts'] = 0
+        session['failed_login_attempts'] = 0
         return redirect('/dashboard')
 
     return render_template('login.html')
 
 # ─── LOGOUT ───────────────────────────────────────────────
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    error = None
+
+    if not admin_is_configured():
+        error = "Admin access is not configured. Set ADMIN_PASSWORD in your environment."
+        return render_template('admin_login.html', error=error), 503
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if (
+            username == app.config["ADMIN_USERNAME"]
+            and password == app.config["ADMIN_PASSWORD"]
+        ):
+            session['is_admin'] = True
+            return redirect('/admin')
+
+        error = "Invalid admin credentials."
+
+    return render_template('admin_login.html', error=error)
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -334,7 +396,7 @@ def logout():
 def update_zone():
     if 'worker_id' not in session:
         return redirect('/login')
-    conn = sqlite3.connect('helix.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('UPDATE workers SET zone=? WHERE id=?',
         (request.form['zone'], session['worker_id']))
@@ -348,7 +410,7 @@ def dashboard():
     if 'worker_id' not in session:
         return redirect('/login')
 
-    conn = sqlite3.connect('helix.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM workers WHERE id=?', (session['worker_id'],))
     worker = cursor.fetchone()
@@ -455,7 +517,7 @@ def claims():
     if 'worker_id' not in session:
         return redirect('/login')
 
-    conn = sqlite3.connect('helix.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM claims WHERE worker_id=?', (session['worker_id'],))
     claim_history = cursor.fetchall()
@@ -492,7 +554,7 @@ def claims():
 def policy():
     if 'worker_id' not in session:
         return redirect('/login')
-    conn = sqlite3.connect('helix.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM workers WHERE id=?', (session['worker_id'],))
     worker = cursor.fetchone()
@@ -504,7 +566,7 @@ def policy():
 def financial():
     if 'worker_id' not in session:
         return redirect('/login')
-    conn = sqlite3.connect('helix.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT COUNT(*) FROM workers')
     total_workers = cursor.fetchone()[0]
@@ -528,7 +590,7 @@ def financial():
 def payout():
     if 'worker_id' not in session:
         return redirect('/login')
-    conn = sqlite3.connect('helix.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM workers WHERE id=?', (session['worker_id'],))
     worker = cursor.fetchone()
@@ -550,7 +612,10 @@ def payout():
 # ─── ADMIN ────────────────────────────────────────────────
 @app.route('/admin')
 def admin():
-    conn = sqlite3.connect('helix.db')
+    if not session.get('is_admin'):
+        return redirect('/admin/login')
+
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute('SELECT COUNT(*) FROM workers')
@@ -598,6 +663,7 @@ def admin():
     )
 
 # ─── RUN ──────────────────────────────────────────────────
+create_database()
+
 if __name__ == '__main__':
-    create_database()
-    app.run(debug=True)
+    app.run(debug=os.getenv('FLASK_DEBUG') == '1')
