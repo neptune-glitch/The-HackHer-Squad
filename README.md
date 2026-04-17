@@ -193,4 +193,7 @@ Then open `http://localhost:5000` in your browser.
 
 👉 https://helix-vxg4.onrender.com
 
+## Pitch Deck
+https://drive.google.com/file/d/1JXNu2O6F43acMj63AenMPgG3cHupQDV6/view?usp=drive_link
+
 *Built in India 🇮🇳 by HackHer Squad*
