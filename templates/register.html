@@ -1,89 +1,324 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register - GigShield</title>
-    <link rel="stylesheet" href="/static/registerstyle.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — Helix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080f1a;
+      --border: rgba(255,255,255,0.09);
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --success: #34d399;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 10% 20%, rgba(56,189,248,0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 60% at 90% 80%, rgba(129,140,248,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+    .card {
+      position: relative;
+      z-index: 1;
+      width: min(460px, 100%);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+    }
+    .card-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 14px;
+      font-size: 24px;
+      margin-bottom: 14px;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .field {
+      margin-bottom: 16px;
+    }
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: var(--accent);
+      background: rgba(56,189,248,0.05);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.1);
+    }
+    input::placeholder { color: rgba(148,163,184,0.4); }
+    select option { background: #1e293b; color: var(--text); }
+    optgroup { color: var(--muted); }
+
+    /* Plan selector */
+    .plan-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .plan-opt input[type="radio"] { display: none; }
+    .plan-opt label {
+      display: block;
+      padding: 12px 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .plan-opt label .plan-n {
+      display: block;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .plan-opt label .plan-p {
+      display: block;
+      font-size: 11px;
+      color: var(--accent);
+    }
+    .plan-opt label .plan-d {
+      display: block;
+      font-size: 10px;
+      color: var(--success);
+      margin-top: 2px;
+    }
+    .plan-opt input:checked + label {
+      border-color: var(--accent);
+      background: rgba(56,189,248,0.08);
+      box-shadow: 0 0 0 2px rgba(56,189,248,0.2);
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      margin-top: 4px;
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #080f1a;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 30px rgba(56,189,248,0.35);
+    }
+    .footer-text {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .footer-text a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .back-home {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .back-home:hover { color: var(--text); }
+  </style>
 </head>
 <body>
+<a href="/" class="back-home">← Home</a>
+<div class="card">
+  <div class="card-header">
+    <div class="logo">🛡</div>
+    <h1>Create your account</h1>
+    <p class="subtitle">Get covered in under 2 minutes</p>
+  </div>
 
-<div class="account">
-    <h1>Helix</h1>
-    <p class="subtitle">Create your account to get protected</p>
+  <form method="POST" action="/register">
+    <!-- Personal -->
+    <p class="section-label">Personal Details</p>
+    <div class="field-row">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" name="name" placeholder="Ravi Kumar" required>
+      </div>
+      <div class="field">
+        <label>Phone Number</label>
+        <input type="text" name="phone" placeholder="9876543210" required>
+      </div>
+    </div>
 
-    <form method="POST" action="/register">
-        
-        <div class="input-group">
-            <input type="text" name="name" required>
-            <label>Full Name</label>
-        </div>
+    <!-- Work -->
+    <p class="section-label">Work Details</p>
+    <div class="field">
+      <label>Your Zone / City</label>
+      <select name="zone" required>
+        <option value="">Select your city or zone</option>
+        <optgroup label="Delhi NCR">
+          <option value="Dwarka">Dwarka</option>
+          <option value="Lajpat Nagar">Lajpat Nagar</option>
+          <option value="Rohini">Rohini</option>
+          <option value="Connaught Place">Connaught Place</option>
+          <option value="Noida">Noida</option>
+        </optgroup>
+        <optgroup label="Other Cities">
+          <option value="Mumbai">Mumbai</option>
+          <option value="Bangalore">Bangalore</option>
+          <option value="Chennai">Chennai</option>
+          <option value="Kolkata">Kolkata</option>
+          <option value="Hyderabad">Hyderabad</option>
+          <option value="Pune">Pune</option>
+          <option value="Ahmedabad">Ahmedabad</option>
+          <option value="Jaipur">Jaipur</option>
+          <option value="Lucknow">Lucknow</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Platform</label>
+        <select name="platform" required>
+          <option value="">Select</option>
+          <option value="Amazon">Amazon</option>
+          <option value="Flipkart">Flipkart</option>
+          <option value="Swiggy">Swiggy</option>
+          <option value="Zomato">Zomato</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>UPI ID</label>
+        <input type="text" name="upi" placeholder="ravi@upi" required>
+      </div>
+    </div>
 
-        <div class="input-group">
-            <input type="text" name="phone" required>
-            <label>Phone Number</label>
-        </div>
+    <!-- Plan -->
+    <p class="section-label">Select Plan</p>
+    <div class="plan-options">
+      <div class="plan-opt">
+        <input type="radio" name="plan" id="basic" value="Basic - ₹25/week">
+        <label for="basic">
+          <span class="plan-n">Basic</span>
+          <span class="plan-p">₹25/wk</span>
+          <span class="plan-d">₹300/day</span>
+        </label>
+      </div>
+      <div class="plan-opt">
+        <input type="radio" name="plan" id="standard" value="Standard - ₹40/week" checked>
+        <label for="standard">
+          <span class="plan-n">Standard ⭐</span>
+          <span class="plan-p">₹40/wk</span>
+          <span class="plan-d">₹500/day</span>
+        </label>
+      </div>
+      <div class="plan-opt">
+        <input type="radio" name="plan" id="premium" value="Premium - ₹60/week">
+        <label for="premium">
+          <span class="plan-n">Premium</span>
+          <span class="plan-p">₹60/wk</span>
+          <span class="plan-d">₹700/day</span>
+        </label>
+      </div>
+    </div>
 
-        <div class="select-group">
-            <select name="zone" required>
-                <option value="">Select Your City/Zone</option>
-    
-                <optgroup label="🏙️ Delhi">
-                    <option value="Dwarka">Dwarka</option>
-                    <option value="Lajpat Nagar">Lajpat Nagar</option>
-                    <option value="Rohini">Rohini</option>
-                    <option value="Connaught Place">Connaught Place</option>
-                </optgroup>
-    
-                <optgroup label="🌆 Other Cities">
-                    <option value="Mumbai">Mumbai</option>
-                    <option value="Bangalore">Bangalore</option>
-                    <option value="Chennai">Chennai</option>
-                    <option value="Kolkata">Kolkata</option>
-                    <option value="Hyderabad">Hyderabad</option>
-                    <option value="Pune">Pune</option>
-                    <option value="Ahmedabad">Ahmedabad</option>
-                    <option value="Jaipur">Jaipur</option>
-                    <option value="Lucknow">Lucknow</option>
-                    <option value="Noida">Noida</option>
-                </optgroup>
-            </select>
-           
-        </div>
+    <!-- Password -->
+    <p class="section-label">Security</p>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" name="password" placeholder="Create a password" required>
+    </div>
 
-        <div class="input-group">
-            <input type="text" name="upi" required>
-            <label>UPI ID</label>
-        </div>
+    <button type="submit" class="btn">Create Account →</button>
+  </form>
 
-        <div class="select-group">
-            <select name="platform" required>
-                <option value="">Select Platform</option>
-                <option value="Amazon">Amazon</option>
-                <option value="Flipkart">Flipkart</option>
-            </select>
-        </div>
-
-        <div class="select-group">
-            <select name="plan" required>
-                <option value="">Select Plan</option>
-                <option value="Basic - ₹25/week">Basic - ₹25/week</option>
-                <option value="Standard - ₹40/week">Standard - ₹40/week</option>
-                <option value="Premium - ₹60/week">Premium - ₹60/week</option>
-            </select>
-        </div>
-
-        <div class="input-group">
-            <input type="password" name="password" required>
-            <label>Password</label>
-        </div>
-
-        <button type="submit" class="btn">Register Now</button>
-
-    </form>
-
-    <p class="login-link">
-        Already registered? <a href="/login">Login here</a>
-    </p>
+  <p class="footer-text">
+    Already have an account? <a href="/login">Sign in</a>
+  </p>
 </div>
-
 </body>
 </html>

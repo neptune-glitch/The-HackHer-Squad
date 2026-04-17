@@ -1,34 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Admin Dashboard - Helix</title>
-  <link rel="stylesheet" href="/static/homestyle.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Helix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    .container { max-width: 1100px; margin: 30px auto; padding: 20px; }
-    .card { background: rgba(255,255,255,0.08); padding: 25px; margin: 15px 0; border-radius: 12px; }
-    .card h2 { color: #00aaff; margin-bottom: 15px; }
-    .card p { color: #d1d5db; margin: 8px 0; }
-    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 15px; margin: 15px 0; }
-    .stat-box { background: rgba(0,170,255,0.1); border: 1px solid #00aaff; border-radius: 10px; padding: 20px; text-align: center; }
-    .stat-number { font-size: 36px; font-weight: bold; color: #00aaff; }
-    .stat-label { color: #aaa; font-size: 12px; margin-top: 5px; }
+    :root {
+      --bg: #060d18; --surface: rgba(255,255,255,0.04); --surface2: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.08); --accent: #06b6d4; --accent2: #818cf8;
+      --text: #e2e8f0; --muted: #94a3b8; --success: #34d399; --warning: #fbbf24; --danger: #f87171;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: radial-gradient(ellipse 80% 40% at 20% 0%, rgba(6,182,212,0.07) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(6,182,212,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(6,182,212,0.025) 1px, transparent 1px);
+      background-size: 60px 60px; pointer-events: none; z-index: 0;
+    }
+
+    /* Topbar */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 32px; background: rgba(6,13,24,0.95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(20px);
+    }
+    .topbar-brand { display: flex; align-items: center; gap: 12px; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; letter-spacing: 2px; }
+    .logo-sq { width: 34px; height: 34px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .admin-badge { padding: 5px 12px; background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25); border-radius: 100px; font-size: 11px; color: var(--accent); font-weight: 700; letter-spacing: 1px; }
+
+    /* Layout */
+    .container { position: relative; z-index: 1; max-width: 1140px; margin: 0 auto; padding: 28px 24px 60px; }
+
+    /* Stats grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; padding: 22px 20px;
+      transition: border-color 0.2s;
+    }
+    .stat-box:hover { border-color: rgba(6,182,212,0.3); }
+    .stat-label { font-size: 11px; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 10px; }
+    .stat-val { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1; }
+
+    /* Cards */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 20px; }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+
+    /* Two-col layout */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+    /* Loss ratio */
+    .ratio-display { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+    .progress-track { height: 8px; background: rgba(255,255,255,0.08); border-radius: 100px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 100px; }
+
+    /* Weather */
+    .weather-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .weather-item { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .weather-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .weather-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+
+    /* AQI Banner */
+    .aqi-banner { background: rgba(129,140,248,0.08); border: 1px solid rgba(129,140,248,0.2); border-radius: 12px; padding: 14px; margin: 14px 0; }
+    .aqi-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; }
+    .aqi-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* Tables */
     table { width: 100%; border-collapse: collapse; }
-    th { background: rgba(0,170,255,0.2); color: #00aaff; padding: 12px; text-align: left; font-size: 13px; }
-    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); color: #d1d5db; font-size: 13px; }
-    .progress-bar { height: 10px; background: #333; border-radius: 5px; margin: 8px 0; }
-    .progress-fill { height: 10px; border-radius: 5px; }
-    .nav-links { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-    .nav-links a { background: #00aaff; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; }
-    .nav-links a.orange { background: #e67e22; }
-    .trust-mini { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
-    .aqi-banner { background: rgba(142,68,173,0.2); border: 1px solid #8e44ad; border-radius: 12px; padding: 15px; margin: 10px 0; }
-    @media(max-width:600px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+    thead { background: rgba(255,255,255,0.05); }
+    th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+    td { padding: 10px 14px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .status-pill { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+
+    /* Prediction */
+    .prediction-card { background: rgba(129,140,248,0.06); border-color: rgba(129,140,248,0.2); }
+    .risk-label { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+
+    /* Action btns */
+    .action-row { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+    .action-btn { padding: 10px 20px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
+    .action-btn.blue { background: var(--accent); color: #060d18; }
+    .action-btn.orange { background: #f97316; color: white; }
+    .action-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+
+    @media(max-width:900px) { .stats-grid { grid-template-columns: repeat(2,1fr); } .two-col { grid-template-columns: 1fr; } }
+    @media(max-width:500px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
 <body>
-<div class="navbar">
-  <img src="https://png.pngtree.com/png-vector/20250422/ourmid/pngtree-blue-shield-badge-clipart-illustration-png-image_16042877.png" alt="logo">
-  <h2>HELIX — INSURER DASHBOARD</h2>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="logo-sq">🛡</div>
+    HELIX INSURER
+  </div>
+  <div style="display:flex; align-items:center; gap:12px">
+    <span class="admin-badge">ADMIN</span>
+    <a href="/logout" style="font-size:13px; color:var(--muted); text-decoration:none;">Logout</a>
+  </div>
 </div>
 
 <div class="container">
@@ -36,120 +115,160 @@
   <!-- Key Stats -->
   <div class="stats-grid">
     <div class="stat-box">
-      <div class="stat-number">{{ total_workers }}</div>
-      <div class="stat-label">Workers Enrolled</div>
+      <p class="stat-label">Workers Enrolled</p>
+      <p class="stat-val" style="color:var(--accent)">{{ total_workers }}</p>
     </div>
     <div class="stat-box">
-      <div class="stat-number" style="color:#f39c12">₹{{ weekly_premium }}</div>
-      <div class="stat-label">Weekly Premium</div>
+      <p class="stat-label">Weekly Premium</p>
+      <p class="stat-val" style="color:var(--success)">₹{{ weekly_premium }}</p>
     </div>
     <div class="stat-box">
-      <div class="stat-number" style="color:#e74c3c">{{ total_claims }}</div>
-      <div class="stat-label">Total Claims</div>
+      <p class="stat-label">Total Claims</p>
+      <p class="stat-val" style="color:var(--warning)">{{ total_claims }}</p>
     </div>
-    <div class="stat-box" style="border-color:{% if profit > 0 %}#27ae60{% else %}#e74c3c{% endif %}">
-      <div class="stat-number" style="color:{% if profit > 0 %}#27ae60{% else %}#e74c3c{% endif %}">
-        ₹{{ profit }}
-      </div>
-      <div class="stat-label">Weekly Profit</div>
+    <div class="stat-box" style="border-color:{% if profit > 0 %}rgba(52,211,153,0.3){% else %}rgba(248,113,113,0.3){% endif %}">
+      <p class="stat-label">Weekly Profit</p>
+      <p class="stat-val" style="color:{% if profit > 0 %}var(--success){% else %}var(--danger){% endif %}">₹{{ profit }}</p>
     </div>
   </div>
 
-  <!-- Loss Ratio -->
-  <div class="card">
-    <h2>📊 Loss Ratio Analysis</h2>
-    <p>Loss Ratio: <strong style="color:{% if loss_ratio > 70 %}#e74c3c{% else %}#27ae60{% endif %}">
-      {{ loss_ratio }}%
-    </strong></p>
-    <div class="progress-bar">
-      <div class="progress-fill" style="width:{{ [loss_ratio, 100]|min }}%; background:{% if loss_ratio > 70 %}#e74c3c{% else %}#27ae60{% endif %}"></div>
-    </div>
-    <p style="color:#aaa; font-size:13px;">
-      {% if loss_ratio > 70 %}⚠️ High loss ratio — consider adjusting premiums{% else %}✅ Sustainable loss ratio — business viable{% endif %}
-    </p>
-  </div>
-
-  <!-- Next Week Prediction -->
-  <div class="card" style="background: rgba(138,43,226,0.1); border: 1px solid #8e44ad;">
-    <h2 style="color:#f39c12">🔮 Next Week Predictive Analytics</h2>
-    <p>📍 Current Weather: <strong>{{ weather['temp'] }}°C — {{ weather['description'] }}</strong></p>
-    <p>🌧️ Rainfall: <strong>{{ weather['rainfall'] }}mm</strong></p>
-
-    <!-- AQI Section -->
-    <div class="aqi-banner">
-      <p>💨 Air Quality Index: <strong style="color:{{ aqi_color }}">{{ weather.get('aqi', '--') }} — {{ aqi_text }}</strong></p>
-      {% if weather.get('aqi', 0) > 400 %}
-      <p style="color:#e74c3c; font-weight:bold; margin-top:6px;">
-        🚨 Hazardous AQI — Pollution payouts may trigger this week!
+  <!-- Two Column: Loss Ratio + Weather -->
+  <div class="two-col">
+    <!-- Loss Ratio -->
+    <div class="card">
+      <p class="card-title">📊 Loss Ratio</p>
+      <p class="ratio-display" style="color:{% if loss_ratio > 70 %}var(--danger){% else %}var(--success){% endif %}">
+        {{ loss_ratio }}%
       </p>
-      {% elif weather.get('aqi', 0) > 200 %}
-      <p style="color:#f39c12; margin-top:6px;">⚠️ Unhealthy AQI levels — monitor closely</p>
-      {% else %}
-      <p style="color:#27ae60; margin-top:6px;">✅ AQI levels acceptable — no pollution trigger expected</p>
-      {% endif %}
+      <div class="progress-track" style="margin:12px 0">
+        <div class="progress-fill" style="width:{{ [loss_ratio, 100]|min }}%; background:{% if loss_ratio > 70 %}var(--danger){% else %}var(--success){% endif %}"></div>
+      </div>
+      <p style="font-size:13px; color:var(--muted)">
+        {% if loss_ratio > 70 %}⚠️ High loss ratio — consider adjusting premiums{% else %}✅ Sustainable loss ratio — business viable{% endif %}
+      </p>
     </div>
 
-    <p>📊 Predicted Risk: <strong>{{ next_week_risk }}</strong></p>
-    <p style="color:#aaa; font-size:13px; margin-top:10px;">
-      Based on Random Forest model analyzing temperature, rainfall, AQI and seasonal patterns
+    <!-- Weather -->
+    <div class="card">
+      <p class="card-title">📡 Delhi Live Conditions</p>
+      <div class="weather-grid">
+        <div class="weather-item">
+          <p class="weather-label">🌡️ Temperature</p>
+          <p class="weather-val" style="color:{% if weather.temp > 44 %}var(--danger){% else %}var(--accent){% endif %}">{{ weather.temp }}°C</p>
+        </div>
+        <div class="weather-item">
+          <p class="weather-label">🌧️ Rainfall</p>
+          <p class="weather-val" style="color:{% if weather.rainfall > 50 %}var(--danger){% else %}var(--accent){% endif %}">{{ weather.rainfall }}mm</p>
+        </div>
+        <div class="weather-item">
+          <p class="weather-label">💧 Humidity</p>
+          <p class="weather-val" style="color:var(--accent)">{{ weather.humidity }}%</p>
+        </div>
+        <div class="weather-item">
+          <p class="weather-label">🌦️ Conditions</p>
+          <p style="font-size:13px; color:var(--text); margin-top:4px">{{ weather.description }}</p>
+        </div>
+      </div>
+      <div class="aqi-banner" style="margin-top:14px">
+        <p class="weather-label">💨 Air Quality Index</p>
+        <p class="aqi-val" style="color:{{ aqi_color }}">{{ weather.get('aqi', '--') }} — {{ aqi_text }}</p>
+        {% if weather.get('aqi', 0) > 400 %}
+        <p style="color:var(--danger); font-size:12px; margin-top:4px; font-weight:600">🚨 Hazardous — pollution payouts may trigger!</p>
+        {% elif weather.get('aqi', 0) > 200 %}
+        <p style="color:var(--warning); font-size:12px; margin-top:4px">⚠️ Unhealthy — monitor closely</p>
+        {% else %}
+        <p style="color:var(--success); font-size:12px; margin-top:4px">✅ AQI acceptable — no trigger expected</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Predictive Analytics -->
+  <div class="card prediction-card">
+    <p class="card-title">🔮 Next Week Predictive Analytics</p>
+    <p class="risk-label" style="color:{% if 'HIGH' in next_week_risk %}var(--danger){% elif 'MEDIUM' in next_week_risk %}var(--warning){% else %}var(--success){% endif %}">
+      {{ next_week_risk }}
     </p>
-    {% if weather['temp'] > 40 %}
-    <p style="color:#e74c3c; margin-top:10px;">⚠️ Expect ~{{ (total_workers // 5) }} claims next week due to heat</p>
+    <p style="font-size:12px; color:var(--muted); margin-top:8px">
+      Random Forest model — inputs: temperature, rainfall, AQI, seasonal patterns
+    </p>
+    {% if weather.temp > 40 %}
+    <p style="color:var(--danger); margin-top:12px; font-size:14px; font-weight:600">⚠️ Expect ~{{ (total_workers // 5) }} claims next week due to heat</p>
     {% else %}
-    <p style="color:#27ae60; margin-top:10px;">✅ Low claim volume expected next week</p>
+    <p style="color:var(--success); margin-top:12px; font-size:14px">✅ Low claim volume expected next week</p>
     {% endif %}
   </div>
 
-  <!-- Workers Coverage with Trust Scores -->
+  <!-- Workers Table -->
   <div class="card">
-    <h2>👥 Active Workers Coverage</h2>
+    <p class="card-title">👥 Active Workers Coverage</p>
+    <div style="overflow-x:auto">
     <table>
-      <tr>
-        <th>Name</th><th>Zone</th><th>Platform</th><th>Plan</th><th>Trust</th><th>Coverage</th>
-      </tr>
-      {% for w in all_workers %}
-      <tr>
-        <td>{{ w[1] }}</td>
-        <td>{{ w[3] }}</td>
-        <td>{{ w[5] }}</td>
-        <td>{{ w[6] }}</td>
-        <td>
-          <span class="trust-mini" style="background:rgba(39,174,96,0.2); color:#27ae60; border:1px solid #27ae60;">
-            🟢 —
-          </span>
-        </td>
-        <td style="color:#27ae60">✅ Active</td>
-      </tr>
-      {% endfor %}
+      <thead>
+        <tr><th>Name</th><th>Zone</th><th>Platform</th><th>Plan</th><th>Trust</th><th>Coverage</th></tr>
+      </thead>
+      <tbody>
+        {% for w in all_workers %}
+        <tr>
+          <td style="color:var(--text); font-weight:500">{{ w[1] }}</td>
+          <td>{{ w[3] }}</td>
+          <td>{{ w[5] }}</td>
+          <td style="color:var(--accent)">{{ w[6] }}</td>
+          <td>
+            <span class="status-pill" style="background:rgba(52,211,153,0.1); color:var(--success); border:1px solid rgba(52,211,153,0.2)">🟢 —</span>
+          </td>
+          <td>
+            <span class="status-pill" style="background:rgba(52,211,153,0.1); color:var(--success); border:1px solid rgba(52,211,153,0.2)">✅ Active</span>
+          </td>
+        </tr>
+        {% endfor %}
+        {% if not all_workers %}
+        <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--muted)">No workers enrolled yet</td></tr>
+        {% endif %}
+      </tbody>
     </table>
+    </div>
   </div>
 
   <!-- Claims Table -->
   <div class="card">
-    <h2>🔔 Recent Claims (with Weather Snapshot)</h2>
+    <p class="card-title">🔔 Recent Claims</p>
+    <div style="overflow-x:auto">
     <table>
-      <tr>
-        <th>ID</th><th>Worker</th><th>Disruption</th><th>Amount</th><th>Status</th><th>Date</th>
-      </tr>
-      {% for c in all_claims %}
-      <tr>
-        <td>{{ c[0] }}</td>
-        <td>{{ c[1] }}</td>
-        <td>{{ c[2] }}</td>
-        <td>₹{{ c[3] }}</td>
-        <td style="color:{% if 'APPROVED' in c[4] %}#27ae60{% elif 'REVIEW' in c[4] %}#f39c12{% else %}#e74c3c{% endif %}">{{ c[4] }}</td>
-        <td>{{ c[5] }}</td>
-      </tr>
-      {% endfor %}
+      <thead>
+        <tr><th>ID</th><th>Worker</th><th>Disruption</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        {% for c in all_claims %}
+        <tr>
+          <td>#{{ c[0] }}</td>
+          <td style="color:var(--text)">{{ c[1] }}</td>
+          <td>{{ c[2] }}</td>
+          <td style="color:var(--success); font-weight:600">₹{{ c[3] }}</td>
+          <td>
+            <span class="status-pill" style="
+              background:{% if 'APPROVED' in c[4] %}rgba(52,211,153,0.1){% elif 'REVIEW' in c[4] %}rgba(251,191,36,0.1){% else %}rgba(248,113,113,0.1){% endif %};
+              color:{% if 'APPROVED' in c[4] %}var(--success){% elif 'REVIEW' in c[4] %}var(--warning){% else %}var(--danger){% endif %};
+              border:1px solid {% if 'APPROVED' in c[4] %}rgba(52,211,153,0.2){% elif 'REVIEW' in c[4] %}rgba(251,191,36,0.2){% else %}rgba(248,113,113,0.2){% endif %}">
+              {{ c[4] }}
+            </span>
+          </td>
+          <td>{{ c[5] }}</td>
+        </tr>
+        {% endfor %}
+        {% if not all_claims %}
+        <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--muted)">No claims recorded yet</td></tr>
+        {% endif %}
+      </tbody>
     </table>
+    </div>
   </div>
 
-  <div class="nav-links">
-    <a href="/">🏠 Home</a>
-    <form method="POST" action="/admin/retrain" style="display:inline;">
-      <button type="submit" style="background:#e67e22; color:white; padding:10px 18px; border-radius:8px; border:none; cursor:pointer; font-size:14px;">
-        🔄 Retrain ML Models
-      </button>
+  <!-- Actions -->
+  <div class="action-row">
+    <a href="/" class="action-btn blue">🏠 Home</a>
+    <form method="POST" action="/admin/retrain" style="display:inline">
+      <button type="submit" class="action-btn orange">🔄 Retrain ML Models</button>
     </form>
   </div>
 

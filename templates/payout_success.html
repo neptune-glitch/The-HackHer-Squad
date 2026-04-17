@@ -1,71 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Payment Success - Helix</title>
-  <link rel="stylesheet" href="/static/homestyle.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Status — Helix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    .container { max-width: 600px; margin: 30px auto; padding: 20px; text-align: center; }
-    .success-card { background: rgba(39,174,96,0.2); border: 2px solid #27ae60; padding: 40px; border-radius: 12px; }
-    .fail-card { background: rgba(231,76,60,0.2); border: 2px solid #e74c3c; padding: 40px; border-radius: 12px; }
-    .amount { font-size: 52px; font-weight: bold; color: #27ae60; margin: 20px 0; }
-    .txn-box { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; margin: 15px 0; }
-    .checkmark { font-size: 80px; margin: 10px 0; }
-    .nav-links { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
-    .nav-links a { background: #00aaff; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; }
+    :root {
+      --bg: #080f1a; --border: rgba(255,255,255,0.08);
+      --accent: #38bdf8; --accent2: #818cf8; --text: #e2e8f0; --muted: #94a3b8;
+      --success: #34d399; --danger: #f87171;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: radial-gradient(ellipse 60% 60% at 50% 40%, {% if success %}rgba(52,211,153,0.08){% else %}rgba(248,113,113,0.08){% endif %} 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .page { position: relative; z-index: 1; max-width: 420px; width: 100%; }
+
+    .result-card {
+      border-radius: 24px; padding: 40px 32px; text-align: center;
+      margin-bottom: 16px;
+    }
+    .result-card.success-card {
+      background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2);
+    }
+    .result-card.fail-card {
+      background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2);
+    }
+    .result-icon { font-size: 64px; margin-bottom: 16px; display: block; }
+    .result-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+    .amount-big { font-family: 'Syne', sans-serif; font-size: 60px; font-weight: 800; color: var(--success); line-height: 1; margin: 20px 0; }
+
+    .info-row {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin-top: 12px; text-align: left;
+    }
+    .info-row-label { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; margin-bottom: 6px; }
+    .info-row-val { font-size: 16px; font-weight: 600; word-break: break-all; }
+
+    .txn-id { color: var(--accent); font-family: 'Syne', sans-serif; }
+    .success-note { color: var(--success); font-size: 14px; margin-top: 16px; font-weight: 500; }
+
+    .nav-row { display: flex; gap: 10px; margin-top: 8px; }
+    .nav-btn { flex: 1; padding: 14px; text-align: center; border: 1px solid var(--border); border-radius: 12px; color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .nav-btn.primary { background: var(--accent); border-color: var(--accent); color: #080f1a; font-weight: 700; }
+    .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .nav-btn.primary:hover { opacity: 0.9; color: #080f1a; }
   </style>
 </head>
 <body>
-<div class="navbar">
-  <img src="https://png.pngtree.com/png-vector/20250422/ourmid/pngtree-blue-shield-badge-clipart-illustration-png-image_16042877.png" alt="logo">
-  <h2>HELIX — PAYMENT STATUS</h2>
-</div>
-
-<div class="container">
+<div class="page">
   {% if success %}
-  <div class="success-card">
-    <div class="checkmark">✅</div>
-    <h2 style="color:#27ae60">Payment Successful!</h2>
-    <div class="amount">₹{{ amount }}</div>
+  <div class="result-card success-card">
+    <span class="result-icon">✅</span>
+    <h1 class="result-title" style="color:var(--success)">Payment Successful!</h1>
+    <div class="amount-big">₹{{ amount }}</div>
 
-    <div class="txn-box">
-      <p style="color:#aaa; font-size:13px;">Transaction ID</p>
-      <p style="color:#00aaff; font-size:18px; font-weight:bold;">{{ transaction_id }}</p>
+    <div class="info-row">
+      <p class="info-row-label">TRANSACTION ID</p>
+      <p class="info-row-val txn-id">{{ transaction_id }}</p>
+    </div>
+    <div class="info-row">
+      <p class="info-row-label">SENT TO UPI</p>
+      <p class="info-row-val">{{ upi_id }}</p>
+    </div>
+    <div class="info-row">
+      <p class="info-row-label">DISRUPTION TYPE</p>
+      <p class="info-row-val">{{ disruption_type }}</p>
+    </div>
+    <div class="info-row">
+      <p class="info-row-label">PAYMENT METHOD</p>
+      <p class="info-row-val" style="color:var(--warning)">Razorpay Test Mode (Simulated UPI)</p>
     </div>
 
-    <div class="txn-box">
-      <p style="color:#aaa; font-size:13px;">Sent to UPI</p>
-      <p style="color:white; font-size:16px;">{{ upi_id }}</p>
-    </div>
-
-    <div class="txn-box">
-      <p style="color:#aaa; font-size:13px;">Disruption Type</p>
-      <p style="color:white">{{ disruption_type }}</p>
-    </div>
-
-    <div class="txn-box">
-      <p style="color:#aaa; font-size:13px;">Payment Method</p>
-      <p style="color:#f39c12">Razorpay Test Mode (Simulated UPI)</p>
-    </div>
-
-    <p style="color:#27ae60; margin-top:20px;">
-      ✅ Money credited to your UPI instantly!
-    </p>
+    <p class="success-note">✅ Money credited to your UPI instantly!</p>
   </div>
-
   {% else %}
-  <div class="fail-card">
-    <div class="checkmark">⚠️</div>
-    <h2 style="color:#e74c3c">Already Claimed Today!</h2>
-    <p style="color:#d1d5db; margin-top:15px;">
-      You have already filed a claim today.
-      Only one claim per day is allowed.
+  <div class="result-card fail-card">
+    <span class="result-icon">⚠️</span>
+    <h1 class="result-title" style="color:var(--danger)">Already Claimed Today</h1>
+    <p style="color:var(--muted); font-size:14px; margin-top:12px; line-height:1.6">
+      You have already filed a claim today.<br>Only one claim per day is allowed.
     </p>
+    <p style="color:var(--muted); font-size:13px; margin-top:16px">Come back tomorrow for a new claim.</p>
   </div>
   {% endif %}
 
-  <div class="nav-links">
-    <a href="/dashboard">🏠 Dashboard</a>
-    <a href="/claims">🔔 Claims History</a>
+  <div class="nav-row">
+    <a href="/dashboard" class="nav-btn primary">🏠 Dashboard</a>
+    <a href="/claims" class="nav-btn">🔔 History</a>
   </div>
 </div>
 </body>

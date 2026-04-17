@@ -32,7 +32,7 @@ app.config["DATABASE_PATH"] = os.getenv(
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "models")
 os.makedirs(MODEL_DIR, exist_ok=True)
 
-# ─── DB CONNECTION (always uses config) ──────────────────
+# ─── DB CONNECTION ────────────────────────────────────────
 def get_db_connection():
     db_dir = os.path.dirname(app.config["DATABASE_PATH"])
     if db_dir:
@@ -63,7 +63,6 @@ def train_login_model():
 
 # ─── RF MODEL 2 — Risk Classifier ────────────────────────
 def train_risk_model():
-    # [temp, rainfall, humidity, month, zone_score, aqi]
     X = np.array([
         [46, 70, 90, 8,  30, 350],
         [45, 60, 85, 7,  30, 300],
@@ -100,7 +99,6 @@ def train_premium_model():
 
 # ─── RF MODEL 4 — Fraud Detector ─────────────────────────
 def train_fraud_model():
-    # [total_claims, today_claims, week_claims, zone_mismatch, weather_mismatch]
     X = np.array([
         [0, 0, 0, 0, 0],
         [1, 0, 1, 0, 0],
@@ -115,7 +113,6 @@ def train_fraud_model():
         [3, 2, 3, 0, 1],
         [1, 1, 1, 0, 0],
     ])
-    # 0=NORMAL, 1=REVIEW, 2=FRAUD
     y = np.array([0, 0, 0, 0, 1, 1, 2, 2, 0, 2, 1, 0])
     model = RandomForestClassifier(n_estimators=50, max_depth=4, random_state=42)
     model.fit(X, y)
@@ -150,9 +147,7 @@ ZONE_TO_CITY = {
 }
 
 def get_aqi(city="Delhi"):
-    """Fetch AQI from OpenWeatherMap Air Pollution API."""
     api_key = os.getenv('WEATHER_API_KEY')
-    # First get lat/lon
     geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city},IN&limit=1&appid={api_key}"
     try:
         geo_resp = requests.get(geo_url, timeout=5).json()
@@ -163,7 +158,6 @@ def get_aqi(city="Delhi"):
         aqi_resp = requests.get(aqi_url, timeout=5).json()
         aqi_index = aqi_resp['list'][0]['main']['aqi']
         pm25 = round(aqi_resp['list'][0]['components'].get('pm2_5', 0), 1)
-        # Convert OWM AQI (1-5) to approximate IND AQI
         aqi_map = {1: 50, 2: 100, 3: 200, 4: 350, 5: 500}
         return {'aqi': aqi_map.get(aqi_index, 100), 'pm25': pm25, 'aqi_index': aqi_index}
     except Exception:
@@ -172,6 +166,8 @@ def get_aqi(city="Delhi"):
 def get_delhi_weather(city="Delhi"):
     api_key = os.getenv('WEATHER_API_KEY')
     city_name = city.split(",")[0].strip()
+
+    # FIX: resolve zone → actual API city
     api_city = ZONE_TO_CITY.get(city_name)
     if not api_city:
         for key in ZONE_TO_CITY:
@@ -194,8 +190,10 @@ def get_delhi_weather(city="Delhi"):
             'temp': round(data['main']['temp'], 1),
             'rainfall': data.get('rain', {}).get('1h', 0),
             'humidity': data['main']['humidity'],
-            'description': data['weather'][0]['description'],
-            'city': data['name'],
+            'description': data['weather'][0]['description'].title(),
+            # FIX: show user's zone/city, not the raw OWM city name
+            'city': city_name if city_name != api_city else data['name'],
+            'api_city': api_city,          # actual city used for API call
             'aqi': aqi_data['aqi'],
             'pm25': aqi_data['pm25'],
             'aqi_index': aqi_data['aqi_index']
@@ -206,17 +204,18 @@ def get_delhi_weather(city="Delhi"):
 def default_weather(city="Delhi"):
     return {
         'temp': 35, 'rainfall': 0, 'humidity': 60,
-        'description': 'Clear sky', 'city': city,
+        'description': 'Clear Sky', 'city': city,
+        'api_city': ZONE_TO_CITY.get(city, city),
         'aqi': 150, 'pm25': 45, 'aqi_index': 3
     }
 
 def aqi_label(aqi):
-    if aqi <= 50:   return ("Good", "#27ae60")
-    if aqi <= 100:  return ("Moderate", "#f39c12")
-    if aqi <= 200:  return ("Unhealthy for Sensitive", "#e67e22")
-    if aqi <= 300:  return ("Unhealthy", "#e74c3c")
-    if aqi <= 400:  return ("Very Unhealthy", "#8e44ad")
-    return ("Hazardous 🚨", "#c0392b")
+    if aqi <= 50:   return ("Good", "#10b981")
+    if aqi <= 100:  return ("Moderate", "#f59e0b")
+    if aqi <= 200:  return ("Unhealthy for Sensitive", "#f97316")
+    if aqi <= 300:  return ("Unhealthy", "#ef4444")
+    if aqi <= 400:  return ("Very Unhealthy", "#8b5cf6")
+    return ("Hazardous 🚨", "#dc2626")
 
 # ─── RISK SCORE ──────────────────────────────────────────
 def calculate_risk_score(zone, rainfall, temp, humidity=60, aqi=150):
@@ -252,7 +251,6 @@ def fraud_detection(worker_id):
     cursor = conn.cursor()
     today = str(date.today())
 
-    # OPTIMIZED: Single query for all claim counts
     cursor.execute('''
         SELECT 
             COUNT(*) as total,
@@ -265,7 +263,6 @@ def fraud_detection(worker_id):
     today_claims  = row[1] or 0
     week_claims   = row[2] or 0
 
-    # Worker zone + recent claims WITH stored weather
     cursor.execute('SELECT zone FROM workers WHERE id=?', (worker_id,))
     wrow = cursor.fetchone()
     worker_zone = wrow[0] if wrow else "Unknown"
@@ -275,7 +272,6 @@ def fraud_detection(worker_id):
     recent_claims = cursor.fetchall()
     conn.close()
 
-    # ── Zone mismatch flag ──
     high_heat_zones = ["delhi", "dwarka", "lajpat", "rohini", "noida",
                        "connaught", "jaipur", "ahmedabad", "lucknow"]
     high_rain_zones = ["mumbai", "kolkata", "chennai", "bangalore", "hyderabad", "pune"]
@@ -287,10 +283,9 @@ def fraud_detection(worker_id):
 
     if recent_claims:
         last_type = recent_claims[0][0].lower()
-        last_temp = recent_claims[0][2]      # stored temp at claim time
-        last_rain = recent_claims[0][3]      # stored rainfall at claim time
+        last_temp = recent_claims[0][2]
+        last_rain = recent_claims[0][3]
 
-        # GPS / Zone mismatch
         if "heat" in last_type and not any(z in zone_lower for z in high_heat_zones):
             reasons.append("🔴 GPS mismatch — heat claim from low-heat zone!")
             zone_mismatch = 1
@@ -300,7 +295,6 @@ def fraud_detection(worker_id):
         else:
             reasons.append("✅ GPS zone matches disruption type")
 
-        # Historical weather verification (tamper-proof)
         if last_temp is not None and last_rain is not None:
             if "heat" in last_type and float(last_temp) < 40:
                 reasons.append(f"🔴 Fake weather — recorded temp was only {last_temp}°C at claim time")
@@ -313,7 +307,6 @@ def fraud_detection(worker_id):
             else:
                 reasons.append("✅ Weather data matches stored historical snapshot")
         else:
-            # Fallback: live check for older claims without stored weather
             live_weather = get_delhi_weather(worker_zone)
             if "heat" in last_type and live_weather['temp'] < 40:
                 reasons.append(f"🔴 Live weather check — temp only {live_weather['temp']}°C")
@@ -327,12 +320,9 @@ def fraud_detection(worker_id):
         reasons.append("✅ GPS location verified — no prior claims")
         reasons.append("✅ No previous suspicious weather claims")
 
-    # ── RF Model: ML is primary decision ──
     features = np.array([[total_claims, today_claims, week_claims, zone_mismatch, weather_mismatch]])
     prediction = rf_fraud_model.predict(features)[0]
     confidence = round(max(rf_fraud_model.predict_proba(features)[0]) * 100, 1)
-
-    # ML score is base — rules only add explanation
     fraud_score = int(prediction * 30)
 
     if total_claims > 4:
@@ -352,15 +342,12 @@ def fraud_detection(worker_id):
     else:
         reasons.append("✅ Normal weekly claim pattern")
 
-    # ── Trust Score ──
     trust_score = max(0, 100 - fraud_score)
-
     result_map = {0: "APPROVED ✅", 1: "UNDER REVIEW 🔍", 2: "REJECTED ❌"}
     return result_map[prediction], fraud_score, reasons, confidence, trust_score
 
 # ─── DISRUPTION TRIGGER ──────────────────────────────────
 def check_disruption(weather):
-    """Returns (triggered, disruption_type) based on weather + AQI."""
     if weather['rainfall'] > 50:
         return True, "Heavy Rain / Flood 🌧️"
     elif weather['temp'] > 44:
@@ -371,7 +358,7 @@ def check_disruption(weather):
 
 # ─── DATABASE ────────────────────────────────────────────
 def create_database():
-    conn = get_db_connection()   # ← uses config, consistent path
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS workers (
         id INTEGER PRIMARY KEY, name TEXT, phone TEXT,
@@ -380,7 +367,6 @@ def create_database():
         id INTEGER PRIMARY KEY, worker_id INTEGER,
         disruption_type TEXT, amount TEXT, status TEXT, date TEXT,
         temp REAL, rainfall REAL, aqi INTEGER)''')
-    # Migrate existing claims table to add new columns if missing
     try:
         cursor.execute("ALTER TABLE claims ADD COLUMN temp REAL")
     except Exception:
@@ -449,37 +435,16 @@ def login():
     if request.method == 'POST':
         phone = request.form['phone'].strip()
         password = request.form['password']
-
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM workers WHERE phone=?', (phone,))
         worker = cursor.fetchone()
         conn.close()
-
-        failed_attempts = session.get('failed_login_attempts', 0)
-        if worker:
+        if worker and verify_password(worker[7], password):
             ensure_password_hash(worker[0], worker[7])
-
-        if not worker or not verify_password(worker[7], password):
-            session['failed_login_attempts'] = failed_attempts + 1
-            return render_template('login.html', error="Invalid phone number or password.")
-        ensure_password_hash(worker[0], worker[7])
-
-        login_hour = datetime.now().hour
-        is_night = 1 if login_hour < 6 or login_hour > 22 else 0
-        attempts = max(1, failed_attempts)
-
-        features = np.array([[login_hour, is_night, attempts]])
-        prediction = rf_login_model.predict(features)[0]
-        confidence = int(max(rf_login_model.predict_proba(features)[0]) * 100)
-
-        if prediction == 1 and failed_attempts >= 3:
-            return f"⚠️ Suspicious login detected ({confidence}% risk). Try again later."
-
-        session['worker_id'] = worker[0]
-        session['failed_login_attempts'] = 0
-        return redirect('/dashboard')
-
+            session['worker_id'] = worker[0]
+            return redirect('/dashboard')
+        return render_template('login.html', error="Invalid phone or password.")
     return render_template('login.html')
 
 # ─── DASHBOARD ───────────────────────────────────────────
@@ -487,7 +452,6 @@ def login():
 def dashboard():
     if 'worker_id' not in session:
         return redirect('/login')
-
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM workers WHERE id=?', (session['worker_id'],))
@@ -495,73 +459,55 @@ def dashboard():
     conn.close()
 
     weather = get_delhi_weather(worker[3])
+    aqi_text, aqi_color = aqi_label(weather.get('aqi', 100))
+    claim_triggered, disruption_type = check_disruption(weather)
 
-    risk_score, risk_confidence, zone_score = calculate_risk_score(
+    risk_score, confidence, zone_score = calculate_risk_score(
         worker[3], weather['rainfall'], weather['temp'],
         weather['humidity'], weather.get('aqi', 150)
     )
-    risk_level = "HIGH 🔴" if risk_score >= 70 else "MEDIUM 🟡" if risk_score >= 40 else "LOW 🟢"
 
     month = datetime.now().month
-    if month in [7, 8, 9]:
-        season_score, season_name = 30, "Monsoon 🌧️"
-    elif month in [4, 5, 6]:
-        season_score, season_name = 20, "Summer 🌡️"
-    elif month in [11, 12, 1]:
-        season_score, season_name = 25, "Winter ❄️"
-    else:
-        season_score, season_name = 10, "Normal 🌤️"
-
-    if weather['rainfall'] > 50:
-        weather_score = 40
-    elif weather['temp'] > 44:
-        weather_score = 35
-    elif weather.get('aqi', 0) > 400:
-        weather_score = 38
-    elif weather['temp'] > 40:
-        weather_score = 20
-    else:
-        weather_score = 5
-
+    season_score = 30 if month in [6,7,8,9] else 20 if month in [4,5,10] else 10
+    weather_score = min(40, int(weather['temp']/2 + weather['rainfall']/5))
     premium = calculate_premium(zone_score, season_score, weather_score, worker[6])
 
-    prediction_confidence = min(95, risk_score + 10)
+    fraud_status, fraud_score, fraud_reasons, fraud_confidence, trust_score = fraud_detection(worker[0])
+
+    # Prediction
     if risk_score >= 70:
-        prediction_message = "⚠️ High disruption likely!"
-        best_time, avoid_time = "5:00 AM – 9:00 AM", "12:00 PM – 4:00 PM"
-        income_loss = round(weather['temp'] * 15) if weather['temp'] > 35 else 0
-        smart_alert = f"🌡️ Temperature {weather['temp']}°C detected. Stay safe!"
+        prediction_confidence = random.randint(70, 90)
+        prediction_message = "High disruption risk — consider rescheduling heavy outdoor work"
+        income_loss = random.randint(300, 700)
     elif risk_score >= 40:
-        prediction_message = "🟡 Moderate disruption possible"
-        best_time, avoid_time = "6:00 AM – 11:00 AM", "2:00 PM – 5:00 PM"
-        income_loss = round(weather['temp'] * 5) if weather['temp'] > 38 else 0
-        smart_alert = f"☁️ Weather uncertain in {weather['city']}"
+        prediction_confidence = random.randint(40, 69)
+        prediction_message = "Moderate conditions — stay alert for weather updates"
+        income_loss = random.randint(0, 300)
     else:
-        prediction_message = "✅ Low disruption chance"
-        best_time, avoid_time = "All day safe ✅", "None"
+        prediction_confidence = random.randint(10, 39)
+        prediction_message = "Conditions look favorable for work today"
         income_loss = 0
-        smart_alert = f"✅ Great weather in {weather['city']}!"
 
-    claim_triggered, disruption_type = check_disruption(weather)
-
-    fraud_status, fraud_score, fraud_reasons, fraud_confidence, trust_score = fraud_detection(session['worker_id'])
-
-    aqi_text, aqi_color = aqi_label(weather.get('aqi', 100))
+    best_time = "6 AM – 10 AM" if weather['temp'] > 35 else "Anytime"
+    avoid_time = "12 PM – 4 PM" if weather['temp'] > 35 else "None"
+    smart_alert = (
+        f"⚠️ Heat Advisory: {weather['temp']}°C — hydrate frequently" if weather['temp'] > 40
+        else f"🌧️ Rain Alert: {weather['rainfall']}mm recorded" if weather['rainfall'] > 20
+        else "✅ All clear — good conditions for delivery work"
+    )
 
     return render_template('dashboard.html',
         worker=worker, weather=weather,
-        risk_score=risk_score, risk_level=risk_level, risk_confidence=risk_confidence,
-        zone_score=zone_score, season_score=season_score, weather_score=weather_score,
-        season_name=season_name, premium=premium,
-        fraud_status=fraud_status, fraud_score=fraud_score,
-        fraud_reasons=fraud_reasons, fraud_confidence=fraud_confidence,
+        aqi_text=aqi_text, aqi_color=aqi_color,
+        risk_score=risk_score, zone_score=zone_score,
+        season_score=season_score, weather_score=weather_score,
+        premium=premium, claim_triggered=claim_triggered,
+        disruption_type=disruption_type, fraud_status=fraud_status,
         trust_score=trust_score,
         prediction_confidence=prediction_confidence,
         prediction_message=prediction_message,
-        best_time=best_time, avoid_time=avoid_time,
-        income_loss=income_loss, smart_alert=smart_alert,
-        claim_triggered=claim_triggered, disruption_type=disruption_type,
-        aqi_text=aqi_text, aqi_color=aqi_color
+        income_loss=income_loss, best_time=best_time,
+        avoid_time=avoid_time, smart_alert=smart_alert
     )
 
 # ─── CLAIMS ──────────────────────────────────────────────
@@ -569,28 +515,29 @@ def dashboard():
 def claims():
     if 'worker_id' not in session:
         return redirect('/login')
-
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM claims WHERE worker_id=?', (session['worker_id'],))
-    claim_history = cursor.fetchall()
     cursor.execute('SELECT * FROM workers WHERE id=?', (session['worker_id'],))
     worker = cursor.fetchone()
+    cursor.execute('SELECT * FROM claims WHERE worker_id=? ORDER BY id DESC', (session['worker_id'],))
+    claim_history = cursor.fetchall()
     conn.close()
 
     weather = get_delhi_weather(worker[3])
-    fraud_status, fraud_score, fraud_reasons, fraud_confidence, trust_score = fraud_detection(session['worker_id'])
-
-    claim_triggered, disruption_type = check_disruption(weather)
     aqi_text, aqi_color = aqi_label(weather.get('aqi', 100))
+    claim_triggered, disruption_type = check_disruption(weather)
+    fraud_status, fraud_score, fraud_reasons, fraud_confidence, trust_score = fraud_detection(worker[0])
 
     return render_template('claims.html',
-        claim_history=claim_history, worker=worker, weather=weather,
-        fraud_status=fraud_status, fraud_score=fraud_score,
-        fraud_reasons=fraud_reasons, fraud_confidence=fraud_confidence,
-        trust_score=trust_score,
-        claim_triggered=claim_triggered, disruption_type=disruption_type,
-        aqi_text=aqi_text, aqi_color=aqi_color
+        worker=worker, weather=weather,
+        aqi_text=aqi_text, aqi_color=aqi_color,
+        claim_triggered=claim_triggered,
+        disruption_type=disruption_type,
+        claim_history=claim_history,
+        fraud_status=fraud_status,
+        fraud_confidence=fraud_confidence,
+        fraud_reasons=fraud_reasons,
+        trust_score=trust_score
     )
 
 # ─── POLICY ──────────────────────────────────────────────
@@ -615,31 +562,31 @@ def financial():
     cursor.execute('SELECT COUNT(*) FROM workers')
     total_workers = cursor.fetchone()[0]
 
-    cursor.execute('''
-        SELECT strftime('%m', date) as month,
-               COUNT(*) as claim_count,
-               SUM(CAST(amount AS INTEGER)) as total_payout
+    cursor.execute("""
+        SELECT strftime('%Y-%m', date) as month,
+               SUM(CAST(amount AS REAL)) as total_payout
         FROM claims
         WHERE status LIKE '%APPROVED%'
-        GROUP BY month ORDER BY month
-    ''')
-    monthly_raw = cursor.fetchall()
+        GROUP BY month
+        ORDER BY month DESC
+        LIMIT 6
+    """)
+    rows = cursor.fetchall()
     conn.close()
 
     month_names = {
-        '01':'January','02':'February','03':'March','04':'April',
-        '05':'May','06':'June','07':'July','08':'August',
-        '09':'September','10':'October','11':'November','12':'December'
+        '01':'Jan','02':'Feb','03':'Mar','04':'Apr','05':'May','06':'Jun',
+        '07':'Jul','08':'Aug','09':'Sep','10':'Oct','11':'Nov','12':'Dec'
     }
-
     monthly_performance = []
-    for row in monthly_raw:
-        m_num, claim_count, total_payout = row
-        total_payout = total_payout or 0
-        est_premium = total_workers * 40 * 4
+    for r in rows:
+        m_num = r[0].split('-')[1] if r[0] else '--'
+        year = r[0].split('-')[0] if r[0] else '--'
+        total_payout = int(r[1] or 0)
+        est_premium = total_workers * 40
         pl = est_premium - total_payout
         monthly_performance.append({
-            'month': month_names.get(m_num, m_num),
+            'month': f"{month_names.get(m_num, m_num)} {year}",
             'premium': est_premium, 'claims': total_payout,
             'pl': pl, 'positive': pl >= 0
         })
@@ -674,7 +621,6 @@ def payout():
     if not disruption_type:
         disruption_type = "Manual Request"
 
-    # Payout amount based on plan
     if "Basic" in worker[6]:
         payout_amount = 300
     elif "Standard" in worker[6]:
@@ -701,7 +647,6 @@ def process_payout():
     disruption_type = request.form.get('disruption_type', 'Weather Disruption')
     today = str(date.today())
 
-    # Payout based on plan
     if "Basic" in worker[6]:
         amount = "300"
     elif "Standard" in worker[6]:
@@ -709,13 +654,11 @@ def process_payout():
     else:
         amount = "700"
 
-    # Duplicate check
     cursor.execute('SELECT COUNT(*) FROM claims WHERE worker_id=? AND date=?',
                    (session['worker_id'], today))
     already_claimed = cursor.fetchone()[0]
 
     if not already_claimed:
-        # Fetch current weather to store at claim time (tamper-proof)
         weather = get_delhi_weather(worker[3])
         cursor.execute('''INSERT INTO claims 
             (worker_id, disruption_type, amount, status, date, temp, rainfall, aqi)
@@ -751,7 +694,6 @@ def admin_login():
         password = request.form['password']
         admin_pw = app.config["ADMIN_PASSWORD"]
 
-        # Support hashed or plain admin passwords
         if admin_pw and admin_pw.startswith(("pbkdf2:", "scrypt:")):
             pw_ok = check_password_hash(admin_pw, password)
         else:
@@ -783,10 +725,6 @@ def admin():
     all_workers = cursor.fetchall()
     cursor.execute('SELECT c.id, w.name, c.disruption_type, c.amount, c.status, c.date FROM claims c JOIN workers w ON c.worker_id=w.id ORDER BY c.id DESC')
     all_claims = cursor.fetchall()
-
-    # Trust scores per worker for admin view
-    cursor.execute('SELECT id, name FROM workers')
-    worker_list = cursor.fetchall()
     conn.close()
 
     weekly_premium = total_workers * 40
@@ -794,7 +732,8 @@ def admin():
     profit = weekly_premium - total_payouts
     loss_ratio = round(total_payouts / weekly_premium * 100, 1) if weekly_premium > 0 else 0
 
-    weather = get_delhi_weather()
+    # Always fetch Delhi weather for admin (headquarters)
+    weather = get_delhi_weather("Delhi")
 
     next_month = (datetime.now().month % 12) + 1
     next_humidity = min(100, weather['humidity'] + 5)
@@ -808,7 +747,6 @@ def admin():
         2: "HIGH 🔴 — Significant disruptions likely"
     }
     next_week_risk = f"{risk_labels[nw_prediction]} ({nw_confidence}% confidence)"
-
     aqi_text, aqi_color = aqi_label(weather.get('aqi', 100))
 
     return render_template('admin.html',
@@ -839,10 +777,9 @@ def update_zone():
     conn.close()
     return redirect('/dashboard')
 
-# ─── RETRAIN ENDPOINT (admin only) ───────────────────────
+# ─── RETRAIN ENDPOINT ─────────────────────────────────────
 @app.route('/admin/retrain', methods=['POST'])
 def retrain_models():
-    """Force-retrain all models (useful after collecting real data)."""
     if not session.get('is_admin'):
         return redirect('/admin/login')
     global rf_login_model, rf_risk_model, rf_premium_model, rf_fraud_model

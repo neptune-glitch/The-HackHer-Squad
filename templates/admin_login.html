@@ -3,90 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Login - Helix</title>
+  <title>Admin Access — Helix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #060d18; --border: rgba(255,255,255,0.08);
+      --accent: #06b6d4; --text: #e2e8f0; --muted: #94a3b8;
+      --danger: #f87171;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: #e2e8f0;
-      font-family: Arial, sans-serif;
+      font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
     }
-
-    .panel {
-      width: min(420px, calc(100vw - 32px));
-      background: rgba(15, 23, 42, 0.88);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      border-radius: 16px;
-      padding: 28px;
-      box-sizing: border-box;
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 30%, rgba(6,182,212,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 20% 70%, rgba(99,102,241,0.06) 0%, transparent 60%);
+      pointer-events: none;
     }
-
-    h1 {
-      margin: 0 0 8px;
-      color: #67e8f9;
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(6,182,212,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(6,182,212,0.03) 1px, transparent 1px);
+      background-size: 50px 50px; pointer-events: none;
     }
-
-    p {
-      margin: 0 0 16px;
-      color: #cbd5e1;
+    .card {
+      position: relative; z-index: 1;
+      width: min(400px, calc(100vw - 32px));
+      background: rgba(6, 13, 24, 0.85);
+      border: 1px solid var(--border); border-radius: 24px; padding: 40px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
     }
-
-    label {
-      display: block;
-      margin: 14px 0 6px;
-      font-size: 14px;
+    .header { text-align: center; margin-bottom: 32px; }
+    .admin-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 16px;
+      background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25);
+      border-radius: 100px; font-size: 12px; color: var(--accent);
+      margin-bottom: 16px; letter-spacing: 1px; font-weight: 600;
     }
-
+    h1 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: var(--muted); }
+    .field { margin-bottom: 18px; }
+    label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
     input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      background: #0f172a;
-      color: #f8fafc;
-      box-sizing: border-box;
+      width: 100%; padding: 13px 16px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 15px;
+      font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.2s;
     }
-
-    button {
-      width: 100%;
-      margin-top: 18px;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      background: #06b6d4;
-      color: #082f49;
-      font-weight: 700;
-      cursor: pointer;
+    input:focus { border-color: var(--accent); background: rgba(6,182,212,0.05); box-shadow: 0 0 0 3px rgba(6,182,212,0.1); }
+    input::placeholder { color: rgba(148,163,184,0.4); }
+    .btn {
+      width: 100%; padding: 14px; margin-top: 8px; border: none; border-radius: 10px;
+      background: var(--accent); color: #060d18; font-size: 15px; font-weight: 700;
+      font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
     }
-
-    .error {
-      margin-top: 12px;
-      color: #fca5a5;
-      font-size: 14px;
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(6,182,212,0.35); }
+    .error-msg {
+      margin-top: 16px; padding: 12px 16px;
+      background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2);
+      border-radius: 8px; color: var(--danger); font-size: 13px; text-align: center;
     }
+    .back { display: block; text-align: center; margin-top: 20px; font-size: 13px; color: var(--muted); text-decoration: none; }
+    .back:hover { color: var(--text); }
   </style>
 </head>
 <body>
-  <div class="panel">
-    <h1>Admin Access</h1>
-    <p>Sign in with your admin credentials to view the platform dashboard.</p>
-
-    <form method="POST" action="/admin/login">
-      <label for="username">Username</label>
-      <input id="username" name="username" type="text" required>
-
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" required>
-
-      <button type="submit">Login</button>
-    </form>
-
-    {% if error %}
-      <div class="error">{{ error }}</div>
-    {% endif %}
+<div class="card">
+  <div class="header">
+    <div class="admin-badge">🔐 ADMIN ACCESS</div>
+    <h1>Insurer Dashboard</h1>
+    <p class="subtitle">Sign in with your administrator credentials</p>
   </div>
+  <form method="POST" action="/admin/login">
+    <div class="field">
+      <label>Username</label>
+      <input type="text" name="username" placeholder="admin" required>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" name="password" placeholder="••••••••" required>
+    </div>
+    <button type="submit" class="btn">Access Dashboard →</button>
+  </form>
+  {% if error %}
+  <div class="error-msg">⚠️ {{ error }}</div>
+  {% endif %}
+  <a href="/" class="back">← Back to home</a>
+</div>
 </body>
 </html>

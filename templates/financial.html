@@ -3,122 +3,183 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Helix - Financial Overview</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-
+  <title>Financial — Helix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    body {
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      min-height: 100vh;
+    :root {
+      --bg: #080f1a; --surface: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+      --accent: #38bdf8; --accent2: #818cf8; --text: #e2e8f0; --muted: #94a3b8;
+      --success: #34d399; --warning: #fbbf24; --danger: #f87171;
     }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 80% 30%, rgba(52,211,153,0.06) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px; background: rgba(8,15,26,0.9); border-bottom: 1px solid var(--border); backdrop-filter: blur(20px);
+    }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 2px; }
+    .logo-sq { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .page { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; padding: 24px 16px 80px; }
+    h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 20px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 16px; }
+    .card-title { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .stat-box { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+    .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .stat-val { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; }
+    .snapshot-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .snapshot-row:last-child { border-bottom: none; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead { background: rgba(255,255,255,0.05); }
+    th { padding: 10px 12px; text-align: left; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+    td { padding: 10px 12px; border-top: 1px solid var(--border); color: var(--muted); }
+    .progress-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 100px; overflow: hidden; margin-top: 8px; }
+    .progress-fill { height: 100%; border-radius: 100px; }
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      display: flex; background: rgba(8,15,26,0.95); border-top: 1px solid var(--border); backdrop-filter: blur(20px);
+    }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 8px; text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; transition: color 0.2s; }
+    .nav-item:hover, .nav-item.active { color: var(--accent); }
+    .nav-icon { font-size: 20px; }
   </style>
 </head>
-
 <body>
+<div class="topbar">
+  <div class="topbar-brand"><div class="logo-sq">🛡</div> HELIX</div>
+</div>
 
-<div class="max-w-md mx-auto p-4 pt-8 text-white">
+<div class="page">
+  <h1>💰 Financial Model</h1>
 
-  <h1 class="text-2xl font-bold text-center text-cyan-400 mb-6">💰 Financial Model</h1>
-
-  <!-- USER BENEFITS -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-cyan-300 font-semibold">Your Monthly Snapshot</h2>
-    <p>💼 Earnings: ₹18,000</p>
-    <p class="text-green-400">🛡️ Loss Prevented: ₹3,000</p>
-    <p>💳 Premium Paid: ₹160</p>
-    <p class="text-blue-400 font-bold">📈 Net Benefit: +₹2,840</p>
+  <!-- Your Snapshot -->
+  <div class="card">
+    <p class="card-title">Your Monthly Snapshot</p>
+    <div class="snapshot-row">
+      <span style="color:var(--muted)">💼 Estimated Earnings</span>
+      <span style="font-weight:600">₹18,000</span>
+    </div>
+    <div class="snapshot-row">
+      <span style="color:var(--muted)">🛡️ Loss Prevented</span>
+      <span style="font-weight:600; color:var(--success)">₹3,000</span>
+    </div>
+    <div class="snapshot-row">
+      <span style="color:var(--muted)">💳 Premium Paid</span>
+      <span style="font-weight:600">₹160</span>
+    </div>
+    <div class="snapshot-row">
+      <span style="color:var(--muted)">📈 Net Benefit</span>
+      <span style="font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--accent)">+₹2,840</span>
+    </div>
   </div>
 
-  <!-- PLATFORM STATS -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-cyan-300 font-semibold">Platform Overview</h2>
-    <p>Total Workers: <strong>{{ total_workers }}</strong></p>
-    <p class="text-green-400">Weekly Premium: ₹{{ weekly_premium }}</p>
-    <p>Expected Claims: {{ expected_claims }}</p>
-    <p class="text-red-400">Payouts: ₹{{ total_payouts }}</p>
-    <p class="text-green-400 font-bold">Profit: ₹{{ profit }}</p>
+  <!-- Platform Stats -->
+  <div class="card">
+    <p class="card-title">Platform Overview</p>
+    <div class="stat-grid">
+      <div class="stat-box">
+        <p class="stat-label">Total Workers</p>
+        <p class="stat-val" style="color:var(--accent)">{{ total_workers }}</p>
+      </div>
+      <div class="stat-box">
+        <p class="stat-label">Weekly Premium</p>
+        <p class="stat-val" style="color:var(--success)">₹{{ weekly_premium }}</p>
+      </div>
+      <div class="stat-box">
+        <p class="stat-label">Expected Claims</p>
+        <p class="stat-val" style="color:var(--warning)">{{ expected_claims }}</p>
+      </div>
+      <div class="stat-box">
+        <p class="stat-label">Weekly Profit</p>
+        <p class="stat-val" style="color:{% if profit > 0 %}var(--success){% else %}var(--danger){% endif %}">₹{{ profit }}</p>
+      </div>
+    </div>
   </div>
 
-  <!-- MONTHLY PERFORMANCE TABLE -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-cyan-300 font-semibold mb-2">📊 Monthly Performance</h2>
-
-    <table class="w-full text-sm text-center border border-gray-600">
-      <thead class="bg-gray-700">
-        <tr>
-          <th class="p-2">Month</th>
-          <th class="p-2">Est. Premium</th>
-          <th class="p-2">Claims Paid</th>
-          <th class="p-2">P/L</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% if monthly_performance %}
-          {% for row in monthly_performance %}
-          <tr class="border-t border-gray-600">
-            <td class="p-2">{{ row.month }}</td>
-            <td class="p-2">₹{{ row.premium }}</td>
-            <td class="p-2">₹{{ row.claims }}</td>
-            <td class="p-2 {% if row.positive %}text-green-400{% else %}text-red-400{% endif %}">
-              {% if row.positive %}+{% endif %}₹{{ row.pl }}
-            </td>
-          </tr>
-          {% endfor %}
-        {% else %}
-          <tr class="border-t border-gray-600">
-            <td colspan="4" class="p-3 text-gray-400">No approved claims recorded yet.</td>
-          </tr>
-        {% endif %}
-      </tbody>
-    </table>
-  </div>
-
-  <!-- LOSS RATIO -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-cyan-300 font-semibold">📉 Loss Ratio</h2>
-    <p>Formula: (Claims / Premium) × 100</p>
-
+  <!-- Loss Ratio -->
+  <div class="card">
+    <p class="card-title">📉 Loss Ratio</p>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:12px">Formula: (Claims / Premium) × 100</p>
     {% if weekly_premium > 0 %}
       {% set ratio = (total_payouts / weekly_premium * 100) | round(1) %}
-      <p class="mt-2 font-bold 
-        {% if ratio < 80 %} text-green-400 
-        {% elif ratio < 100 %} text-yellow-400 
-        {% else %} text-red-400 {% endif %}">
-        {{ ratio }}%
+      <p style="font-family:'Syne',sans-serif; font-size:36px; font-weight:800; color:{% if ratio < 80 %}var(--success){% elif ratio < 100 %}var(--warning){% else %}var(--danger){% endif %}">{{ ratio }}%</p>
+      <div class="progress-track" style="margin-top:12px">
+        <div class="progress-fill" style="width:{{ [ratio, 100]|min }}%; background:{% if ratio < 80 %}var(--success){% elif ratio < 100 %}var(--warning){% else %}var(--danger){% endif %}"></div>
+      </div>
+      <p style="font-size:12px; color:var(--muted); margin-top:8px">
+        {% if ratio < 80 %}✅ Healthy ratio — business sustainable
+        {% elif ratio < 100 %}⚠️ Approaching breakeven — monitor closely
+        {% else %}🔴 Loss-making — premium adjustment needed{% endif %}
       </p>
     {% else %}
-      <p>No data</p>
+      <p style="color:var(--muted)">No data yet</p>
     {% endif %}
   </div>
 
-  <!-- SUSTAINABILITY -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-cyan-300 font-semibold">📈 Sustainability</h2>
-    <ul class="list-disc pl-5 text-sm text-gray-300">
-      <li>Break-even at ~70% loss ratio</li>
-      <li>Reserve fund needed: ₹2–3 lakh</li>
-      <li>Expected growth: 8–12% monthly</li>
-    </ul>
+  <!-- Monthly Performance -->
+  <div class="card">
+    <p class="card-title">📊 Monthly Performance</p>
+    {% if monthly_performance %}
+    <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr><th>Month</th><th>Est. Premium</th><th>Claims Paid</th><th>P/L</th></tr>
+      </thead>
+      <tbody>
+        {% for row in monthly_performance %}
+        <tr>
+          <td>{{ row.month }}</td>
+          <td>₹{{ row.premium }}</td>
+          <td style="color:var(--danger)">₹{{ row.claims }}</td>
+          <td style="color:{% if row.positive %}var(--success){% else %}var(--danger){% endif %}; font-weight:600">
+            {% if row.positive %}+{% endif %}₹{{ row.pl }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% else %}
+    <p style="color:var(--muted); font-size:14px; text-align:center; padding:16px">No approved claims recorded yet.</p>
+    {% endif %}
   </div>
 
-  <!-- PRICING MODEL -->
-  <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl shadow p-4 mb-4">
-    <h2 class="text-cyan-300 font-semibold">💡 Weekly Pricing Model</h2>
-    <p>₹49 – ₹99 per week</p>
-    <ul class="list-disc pl-5 text-sm text-gray-300">
-      <li>Fits gig workers income cycle</li>
-      <li>Lower upfront cost</li>
-      <li>Higher retention</li>
-    </ul>
+  <!-- Sustainability -->
+  <div class="card">
+    <p class="card-title">📈 Sustainability Metrics</p>
+    <div style="display:flex; flex-direction:column; gap:10px">
+      <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px">
+        <span style="color:var(--muted)">Break-even loss ratio</span>
+        <span style="font-weight:600; color:var(--accent)">~70%</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px">
+        <span style="color:var(--muted)">Reserve fund target</span>
+        <span style="font-weight:600">₹2–3 lakh</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px">
+        <span style="color:var(--muted)">Pricing range</span>
+        <span style="font-weight:600">₹25–₹60/week</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px">
+        <span style="color:var(--muted)">Expected growth</span>
+        <span style="font-weight:600; color:var(--success)">8–12% monthly</span>
+      </div>
+    </div>
   </div>
-
-  <!-- BACK -->
-  <a href="/dashboard"
-     class="block text-center bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-xl mt-4">
-    ← Back to Dashboard
-  </a>
 
 </div>
 
+<nav class="bottom-nav">
+  <a href="/dashboard" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
+  <a href="/claims" class="nav-item"><span class="nav-icon">🔔</span>Claims</a>
+  <a href="/policy" class="nav-item"><span class="nav-icon">📄</span>Policy</a>
+  <a href="/financial" class="nav-item active"><span class="nav-icon">💰</span>Financial</a>
+</nav>
 </body>
 </html>

@@ -1,170 +1,515 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dashboard - Helix</title>
-  <link rel="stylesheet" href="/static/homestyle.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Helix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-    .navbar { width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px; }
-    .dashboard-container { width: 100%; max-width: 500px; margin: 40px auto; display: flex; flex-direction: column; align-items: center; }
-    .card { width: 100%; max-width: 420px; background: rgba(255,255,255,0.08); padding: 20px; margin: 12px 0; border-radius: 12px; backdrop-filter: blur(8px); }
-    .card h2 { color: #00aaff; margin-bottom: 10px; text-align: center; }
-    .card p { color: #d1d5db; margin: 6px 0; font-size: 14px; text-align: center; }
-    .ai-breakdown { background: rgba(0,170,255,0.1); border: 1px solid #00aaff; border-radius: 10px; padding: 12px; margin: 10px 0; }
-    .ai-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .ai-row:last-child { border-bottom: none; font-weight: bold; }
-    .score-bar { height: 10px; border-radius: 6px; background: #333; margin: 8px 0; }
-    .score-fill { height: 10px; border-radius: 6px; }
-    .wow-box { width: 100%; max-width: 420px; background: linear-gradient(135deg, rgba(0,170,255,0.2), rgba(138,43,226,0.2)); border: 1px solid #00aaff; border-radius: 12px; padding: 18px; margin: 12px 0; }
-    .prediction-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin: 6px 0; }
-    .alert-red { width: 100%; max-width: 420px; background: rgba(231,76,60,0.3); border: 2px solid #e74c3c; padding: 18px; border-radius: 12px; margin: 12px 0; }
-    .alert-green { width: 100%; max-width: 420px; background: rgba(39,174,96,0.3); border: 2px solid #27ae60; padding: 18px; border-radius: 12px; margin: 12px 0; }
-    .nav-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
-    .nav-links a { background: #00aaff; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; }
-    .nav-links a.red { background: #e74c3c; }
-    form { text-align: center; margin-top: 10px; }
-    select, button { padding: 6px; border-radius: 6px; }
-    button { border: none; background: #00aaff; color: white; }
-    .trust-bar { height: 12px; border-radius: 6px; background: #333; margin: 8px 0; }
-    .trust-fill { height: 12px; border-radius: 6px; transition: width 0.5s; }
-    .aqi-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-top: 4px; }
+    :root {
+      --bg: #080f1a;
+      --surface: rgba(255,255,255,0.04);
+      --surface2: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.08);
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 20% 0%, rgba(56,189,248,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      background: rgba(8,15,26,0.9);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+    }
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+    .topbar-brand .logo-sq {
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .worker-pill {
+      padding: 6px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .logout-btn {
+      padding: 7px 16px;
+      background: transparent;
+      border: 1px solid rgba(248,113,113,0.3);
+      color: var(--danger);
+      border-radius: 8px;
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { background: rgba(248,113,113,0.1); }
+
+    /* ── LAYOUT ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 24px 16px 80px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* Welcome */
+    .welcome-card {
+      background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(129,140,248,0.06));
+      border-color: rgba(56,189,248,0.15);
+    }
+    .welcome-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .worker-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .meta-chip {
+      padding: 4px 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .meta-chip strong { color: var(--text); }
+    .zone-form {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .zone-form select {
+      flex: 1;
+      padding: 9px 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+    }
+    .zone-form select option { background: #1e293b; }
+    .zone-btn {
+      padding: 9px 16px;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      color: #080f1a;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .zone-btn:hover { box-shadow: 0 4px 20px rgba(56,189,248,0.4); }
+
+    /* Weather */
+    .weather-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .weather-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .weather-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .weather-value { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; }
+    .weather-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* Risk Score */
+    .score-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 12px;
+    }
+    .score-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .score-breakdown {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+    }
+    .score-breakdown div { padding: 3px 0; }
+    .score-breakdown span { color: var(--accent); font-weight: 600; }
+    .progress-track {
+      height: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-fill { height: 100%; border-radius: 100px; transition: width 0.8s; }
+    .score-label { font-size: 12px; color: var(--muted); }
+
+    /* Trust Score */
+    .trust-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .trust-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    /* Prediction */
+    .prediction-card {
+      background: linear-gradient(135deg, rgba(56,189,248,0.06), rgba(129,140,248,0.06));
+      border-color: rgba(56,189,248,0.12);
+    }
+    .pred-confidence {
+      font-family: 'Syne', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .pred-message { font-size: 14px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+    .pred-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .pred-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .pred-item-label { font-size: 10px; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 4px; }
+    .pred-item-val { font-size: 14px; font-weight: 500; }
+
+    /* Alert */
+    .alert-card {
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .alert-card.triggered {
+      background: rgba(251,191,36,0.07);
+      border: 1px solid rgba(251,191,36,0.25);
+    }
+    .alert-card.clear {
+      background: rgba(52,211,153,0.06);
+      border: 1px solid rgba(52,211,153,0.2);
+    }
+    .alert-icon { font-size: 32px; margin-bottom: 10px; }
+    .alert-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .alert-sub { font-size: 13px; color: var(--muted); }
+    .payout-btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 14px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    .payout-btn.primary {
+      background: var(--success);
+      color: #080f1a;
+    }
+    .payout-btn.secondary {
+      background: var(--accent);
+      color: #080f1a;
+    }
+    .payout-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+    .payout-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--success);
+      margin: 8px 0;
+    }
+
+    /* Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      background: rgba(8,15,26,0.95);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 8px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 11px;
+      gap: 4px;
+      transition: color 0.2s;
+    }
+    .nav-item:hover, .nav-item.active { color: var(--accent); }
+    .nav-item .nav-icon { font-size: 20px; }
   </style>
 </head>
 <body>
 
-<div class="navbar">
-  <img src="https://png.pngtree.com/png-vector/20250422/ourmid/pngtree-blue-shield-badge-clipart-illustration-png-image_16042877.png" width="40">
-  <h2>HELIX DASHBOARD</h2>
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="logo-sq">🛡</div>
+    HELIX
+  </div>
+  <div class="topbar-right">
+    <span class="worker-pill">{{ worker[1] }}</span>
+    <a href="/logout" class="logout-btn">Logout</a>
+  </div>
 </div>
 
-<div class="dashboard-container">
+<div class="page">
 
   <!-- Welcome -->
-  <div class="card">
-    <h2>Welcome {{ worker[1] }}</h2>
-    <p>{{ worker[5] }} • {{ worker[3] }}</p>
-    <p>UPI: {{ worker[4] }}</p>
-    <p>Plan: {{ worker[6] }}</p>
-    <form method="POST" action="/update_zone">
+  <div class="card welcome-card">
+    <div class="welcome-name">👋 {{ worker[1] }}</div>
+    <div class="worker-meta">
+      <span class="meta-chip"><strong>{{ worker[5] }}</strong></span>
+      <span class="meta-chip">📍 <strong>{{ worker[3] }}</strong></span>
+      <span class="meta-chip">💳 {{ worker[4] }}</span>
+      <span class="meta-chip">{{ worker[6] }}</span>
+    </div>
+    <form method="POST" action="/update_zone" class="zone-form">
       <select name="zone">
-        <option>Noida</option><option>Delhi</option><option>Mumbai</option>
-        <option>Hyderabad</option><option>Pune</option>
+        <option>Noida</option><option>Delhi</option><option>Dwarka</option>
+        <option>Rohini</option><option>Lajpat Nagar</option>
+        <option>Mumbai</option><option>Bangalore</option><option>Chennai</option>
+        <option>Kolkata</option><option>Hyderabad</option><option>Pune</option>
       </select>
-      <button>Update Zone</button>
+      <button type="submit" class="zone-btn">Update Zone</button>
     </form>
   </div>
 
-  <!-- Weather + AQI -->
+  <!-- Weather -->
   <div class="card">
-    <h2>{{ weather.city }} Live Conditions</h2>
-    <p>🌡️ {{ weather['temp'] }}°C &nbsp;|&nbsp; 💧 {{ weather['humidity'] }}%</p>
-    <p>🌦️ {{ weather['description'] }}</p>
-    <p>🌧️ Rainfall: {{ weather['rainfall'] }}mm</p>
-    <p>
-      💨 AQI: {{ weather.get('aqi', '--') }}
-      <span class="aqi-badge" style="background:{{ aqi_color }}20; color:{{ aqi_color }}; border:1px solid {{ aqi_color }}">
-        {{ aqi_text }}
-      </span>
-    </p>
-    {% if weather.get('aqi', 0) > 400 %}
-    <p style="color:#e74c3c; font-weight:bold;">⚠️ Hazardous AQI — Payout may be triggered!</p>
-    {% endif %}
-  </div>
-
-  <!-- Risk Score -->
-  <div class="card">
-    <h2>AI Risk Score</h2>
-    <div class="ai-breakdown">
-      <div class="ai-row"><span>Zone</span><span>+{{ zone_score }}</span></div>
-      <div class="ai-row"><span>Season</span><span>+{{ season_score }}</span></div>
-      <div class="ai-row"><span>Weather</span><span>+{{ weather_score }}</span></div>
-      <div class="ai-row"><span>Total</span><span>{{ risk_score }}/100</span></div>
-    </div>
-    <div class="score-bar">
-      <div class="score-fill" style="width:{{ risk_score }}%; background:
-        {% if risk_score >= 70 %}#e74c3c{% elif risk_score >= 40 %}#f39c12{% else %}#27ae60{% endif %}">
+    <p class="card-title">📡 {{ weather.city }} Live Conditions</p>
+    <div class="weather-grid">
+      <div class="weather-item">
+        <p class="weather-label">🌡️ Temperature</p>
+        <p class="weather-value" style="color:{% if weather.temp > 44 %}var(--danger){% elif weather.temp > 38 %}var(--warning){% else %}var(--success){% endif %}">{{ weather.temp }}°C</p>
+        <p class="weather-sub">{% if weather.temp > 44 %}Extreme — trigger active{% elif weather.temp > 38 %}High heat{% else %}Normal range{% endif %}</p>
+      </div>
+      <div class="weather-item">
+        <p class="weather-label">🌧️ Rainfall</p>
+        <p class="weather-value" style="color:{% if weather.rainfall > 50 %}var(--danger){% elif weather.rainfall > 20 %}var(--warning){% else %}var(--accent){% endif %}">{{ weather.rainfall }}mm</p>
+        <p class="weather-sub">{% if weather.rainfall > 50 %}Heavy — trigger active{% elif weather.rainfall > 20 %}Moderate rain{% else %}No rain{% endif %}</p>
+      </div>
+      <div class="weather-item">
+        <p class="weather-label">💧 Humidity</p>
+        <p class="weather-value" style="color:var(--accent)">{{ weather.humidity }}%</p>
+        <p class="weather-sub">{{ weather.description }}</p>
+      </div>
+      <div class="weather-item">
+        <p class="weather-label">💨 AQI</p>
+        <p class="weather-value" style="color:{{ aqi_color }}">{{ weather.get('aqi', '--') }}</p>
+        <p class="weather-sub" style="color:{{ aqi_color }}">{{ aqi_text }}</p>
       </div>
     </div>
-    <p>₹{{ premium }}/week</p>
-  </div>
-
-  <!-- Trust Score -->
-  <div class="card">
-    <h2>🛡️ Trust Score</h2>
-    {% set ts = trust_score %}
-    <p style="font-size:28px; font-weight:bold; color:
-      {% if ts >= 70 %}#27ae60{% elif ts >= 40 %}#f39c12{% else %}#e74c3c{% endif %}">
-      {{ ts }}/100
-      {% if ts >= 70 %}🟢 Trusted{% elif ts >= 40 %}🟡 Watchlist{% else %}🔴 High Risk{% endif %}
-    </p>
-    <div class="trust-bar">
-      <div class="trust-fill" style="width:{{ ts }}%; background:
-        {% if ts >= 70 %}#27ae60{% elif ts >= 40 %}#f39c12{% else %}#e74c3c{% endif %}">
-      </div>
-    </div>
-    <p style="font-size:12px; color:#aaa;">Higher score = faster claim approvals</p>
-  </div>
-
-  <!-- Next 24h Prediction -->
-  <div class="wow-box">
-    <h2 style="color:#00aaff; text-align:center;">Next 24h Prediction</h2>
-    <div class="prediction-item">
-      <p>{{ prediction_confidence }}% risk</p>
-      <p>{{ prediction_message }}</p>
-    </div>
-    <div class="prediction-item">
-      <p>Best: {{ best_time }}</p>
-      <p>Avoid: {{ avoid_time }}</p>
-    </div>
-    <div class="prediction-item">
-      <p>{% if income_loss > 0 %}⚠️ Potential Loss: ₹{{ income_loss }}{% else %}✅ No income loss expected{% endif %}</p>
-    </div>
-    <div class="prediction-item"><p>{{ smart_alert }}</p></div>
-  </div>
-
-  <!-- Protection Summary -->
-  <div class="card">
-    <h2>🛡️ Your Protection Summary</h2>
-    <p>💰 Weekly Premium: <strong style="color:#00aaff">₹{{ premium }}</strong></p>
-    <p>🛡️ Coverage Active: <strong style="color:#27ae60">✅ YES</strong></p>
-    <p>📅 Coverage Period: <strong>This Week</strong></p>
-    <p>💸 Max Payout This Week:
-      <strong style="color:#27ae60">
-        {% if "Basic" in worker[6] %}₹300{% elif "Standard" in worker[6] %}₹500{% else %}₹700{% endif %}
-      </strong>
-    </p>
-    {% if claim_triggered %}
-    <a href="/payout" style="display:block; background:#27ae60; color:white; padding:12px; border-radius:8px; text-decoration:none; text-align:center; margin-top:15px; font-weight:bold;">
-      💸 Claim Your Payout Now!
-    </a>
-    {% else %}
-    <a href="/payout" style="display:block; background:#00aaff; color:white; padding:12px; border-radius:8px; text-decoration:none; text-align:center; margin-top:15px; font-weight:bold;">
-      💸 Request Manual Payout
-    </a>
-    {% endif %}
   </div>
 
   <!-- Disruption Alert -->
   {% if claim_triggered %}
-  <div class="alert-red">
-    <h2 style="text-align:center;">⚠️ Active Disruption</h2>
-    <p style="text-align:center;">{{ disruption_type }}</p>
+  <div class="alert-card triggered">
+    <div class="alert-icon">⚠️</div>
+    <p class="alert-title" style="color:var(--warning)">Active Disruption</p>
+    <p class="alert-sub">{{ disruption_type }}</p>
+    <p class="payout-amount">₹{% if "Basic" in worker[6] %}300{% elif "Standard" in worker[6] %}500{% else %}700{% endif %}</p>
+    <a href="/payout" class="payout-btn primary">💸 Claim Payout Now</a>
   </div>
   {% else %}
-  <div class="alert-green">
-    <h2 style="text-align:center;">✅ All Clear</h2>
-    <p style="text-align:center;">No active disruption. Stay safe!</p>
+  <div class="alert-card clear">
+    <div class="alert-icon">✅</div>
+    <p class="alert-title" style="color:var(--success)">All Clear</p>
+    <p class="alert-sub">No active disruption — conditions are safe</p>
+    <p class="payout-amount" style="color:var(--accent)">₹{% if "Basic" in worker[6] %}300{% elif "Standard" in worker[6] %}500{% else %}700{% endif %}</p>
+    <p style="font-size:12px; color:var(--muted); margin-top:6px;">Manual payout still available</p>
+    <a href="/payout" class="payout-btn secondary">💸 Request Payout</a>
   </div>
   {% endif %}
 
-  <!-- Navigation -->
-  <div class="nav-links">
-    <a href="/claims">🔔 Claims</a>
-    <a href="/policy">📄 Policy</a>
-    <a href="/financial">💰 Financial</a>
-    <a href="/logout" class="red">🚪 Logout</a>
+  <!-- Risk Score -->
+  <div class="card">
+    <p class="card-title">🤖 AI Risk Score</p>
+    <div class="score-display">
+      <div class="score-num" style="color:{% if risk_score >= 70 %}var(--danger){% elif risk_score >= 40 %}var(--warning){% else %}var(--success){% endif %}">
+        {{ risk_score }}
+      </div>
+      <div class="score-breakdown">
+        <div>Zone <span>+{{ zone_score }}</span></div>
+        <div>Season <span>+{{ season_score }}</span></div>
+        <div>Weather <span>+{{ weather_score }}</span></div>
+      </div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:{{ risk_score }}%; background:{% if risk_score >= 70 %}var(--danger){% elif risk_score >= 40 %}var(--warning){% else %}var(--success){% endif %}"></div>
+    </div>
+    <p class="score-label">
+      {% if risk_score >= 70 %}🔴 High risk week — disruption likely
+      {% elif risk_score >= 40 %}🟡 Moderate risk — stay alert
+      {% else %}🟢 Low risk — favorable conditions{% endif %}
+      &nbsp;·&nbsp; ₹{{ premium }}/week premium
+    </p>
+  </div>
+
+  <!-- Trust Score -->
+  <div class="card">
+    <p class="card-title">🛡️ Trust Score</p>
+    {% set ts = trust_score %}
+    <div class="trust-num" style="color:{% if ts >= 70 %}var(--success){% elif ts >= 40 %}var(--warning){% else %}var(--danger){% endif %}">
+      {{ ts }}<span style="font-size:18px; color:var(--muted)">/100</span>
+    </div>
+    <div class="trust-badge" style="background:{% if ts >= 70 %}rgba(52,211,153,0.1){% elif ts >= 40 %}rgba(251,191,36,0.1){% else %}rgba(248,113,113,0.1){% endif %}; color:{% if ts >= 70 %}var(--success){% elif ts >= 40 %}var(--warning){% else %}var(--danger){% endif %}; border: 1px solid {% if ts >= 70 %}rgba(52,211,153,0.2){% elif ts >= 40 %}rgba(251,191,36,0.2){% else %}rgba(248,113,113,0.2){% endif %}">
+      {% if ts >= 70 %}🟢 Trusted{% elif ts >= 40 %}🟡 Watchlist{% else %}🔴 High Risk{% endif %}
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:{{ ts }}%; background:{% if ts >= 70 %}var(--success){% elif ts >= 40 %}var(--warning){% else %}var(--danger){% endif %}"></div>
+    </div>
+    <p class="score-label">Higher score = faster future approvals</p>
+  </div>
+
+  <!-- Next 24h Prediction -->
+  <div class="card prediction-card">
+    <p class="card-title">🔮 Next 24h Forecast</p>
+    <div class="pred-confidence">{{ prediction_confidence }}%</div>
+    <p class="pred-message">{{ prediction_message }}</p>
+    <div class="pred-grid">
+      <div class="pred-item">
+        <p class="pred-item-label">Best Time</p>
+        <p class="pred-item-val">{{ best_time }}</p>
+      </div>
+      <div class="pred-item">
+        <p class="pred-item-label">Avoid</p>
+        <p class="pred-item-val">{{ avoid_time }}</p>
+      </div>
+      <div class="pred-item">
+        <p class="pred-item-label">Income Risk</p>
+        <p class="pred-item-val" style="color:{% if income_loss > 0 %}var(--danger){% else %}var(--success){% endif %}">
+          {% if income_loss > 0 %}−₹{{ income_loss }}{% else %}None{% endif %}
+        </p>
+      </div>
+      <div class="pred-item">
+        <p class="pred-item-label">Alert</p>
+        <p class="pred-item-val" style="font-size:12px">{{ smart_alert }}</p>
+      </div>
+    </div>
   </div>
 
 </div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="/dashboard" class="nav-item active">
+    <span class="nav-icon">🏠</span>Home
+  </a>
+  <a href="/claims" class="nav-item">
+    <span class="nav-icon">🔔</span>Claims
+  </a>
+  <a href="/policy" class="nav-item">
+    <span class="nav-icon">📄</span>Policy
+  </a>
+  <a href="/financial" class="nav-item">
+    <span class="nav-icon">💰</span>Financial
+  </a>
+</nav>
+
 </body>
 </html>

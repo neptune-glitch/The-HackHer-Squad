@@ -1,62 +1,580 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Helix</title>
-  <link rel="stylesheet" href="/static/homestyle.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Helix — Protecting Gig Workers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080f1a;
+      --surface: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --gold: #fbbf24;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --success: #34d399;
+      --danger: #f87171;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(56,189,248,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(129,140,248,0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(251,191,36,0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grid overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .nav-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .nav-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: 2px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 12px;
+    }
+    .nav-links a {
+      padding: 8px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .nav-links .btn-ghost {
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .nav-links .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+    .nav-links .btn-primary {
+      background: var(--accent);
+      color: #080f1a;
+      font-weight: 600;
+    }
+    .nav-links .btn-primary:hover {
+      background: #7dd3fc;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 100px 20px 60px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(56,189,248,0.1);
+      border: 1px solid rgba(56,189,248,0.25);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--accent);
+      margin-bottom: 32px;
+      letter-spacing: 0.5px;
+    }
+    .hero-badge span { display: inline-block; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(42px, 8vw, 80px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+    }
+    h1 .line2 {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cta-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 36px;
+      background: var(--accent);
+      color: #080f1a;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      transition: all 0.2s;
+      box-shadow: 0 0 30px rgba(56,189,248,0.3);
+    }
+    .cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 50px rgba(56,189,248,0.5);
+    }
+    .cta-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 36px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 16px;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+    .cta-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── STATS STRIP ── */
+    .stats-strip {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin: 60px 20px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .stat-item {
+      flex: 1;
+      padding: 28px 20px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .stat-lbl { font-size: 12px; color: var(--muted); margin-top: 4px; letter-spacing: 0.5px; }
+
+    /* ── FEATURES ── */
+    .section {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+    .section-label {
+      text-align: center;
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      text-align: center;
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 800;
+      margin-bottom: 56px;
+      letter-spacing: -1px;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0);
+      transition: transform 0.3s;
+      transform-origin: left;
+    }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card:hover {
+      border-color: rgba(56,189,248,0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .feature-card p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* ── PLANS ── */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 56px;
+    }
+    .plan-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 28px;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .plan-card.featured {
+      border-color: var(--accent);
+      background: rgba(56,189,248,0.05);
+      box-shadow: 0 0 40px rgba(56,189,248,0.1);
+    }
+    .plan-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: #080f1a;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 100px;
+      letter-spacing: 1px;
+    }
+    .plan-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .plan-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .plan-price span { font-size: 16px; color: var(--muted); font-weight: 400; }
+    .plan-payout {
+      font-size: 13px;
+      color: var(--success);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .plan-features { list-style: none; margin-bottom: 24px; }
+    .plan-features li {
+      font-size: 14px;
+      color: var(--muted);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .plan-features li:last-child { border-bottom: none; }
+    .plan-features li::before { content: '✓ '; color: var(--success); font-weight: 700; }
+
+    /* ── STORY ── */
+    .story-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px;
+      max-width: 700px;
+      margin: 0 auto 80px;
+      position: relative;
+      z-index: 1;
+    }
+    .story-quote {
+      font-size: 48px;
+      color: var(--accent);
+      font-family: 'Syne', sans-serif;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .story-text {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+    .story-highlight {
+      color: var(--text);
+      font-weight: 500;
+    }
+    .story-outcome {
+      color: var(--success);
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media(max-width: 600px) {
+      nav { padding: 16px 20px; }
+      .nav-title { font-size: 16px; }
+      .hero { padding: 60px 20px 40px; }
+      .stats-strip { flex-direction: column; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat-item:last-child { border-bottom: none; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="navbar">
-    <img src="https://png.pngtree.com/png-vector/20250422/ourmid/pngtree-blue-shield-badge-clipart-illustration-png-image_16042877.png" alt="logo"> 
-    <h2>WELCOME TO HELIX</h2> 
-</div>
+<nav>
+  <a class="nav-brand" href="/">
+    <div class="nav-logo">🛡</div>
+    <span class="nav-title">HELIX</span>
+  </a>
+  <div class="nav-links">
+    <a href="/login" class="btn-ghost">Sign In</a>
+    <a href="/register" class="btn-primary">Get Started</a>
+  </div>
+</nav>
 
-<div class="text">
-  <p>"Protecting Gig Workers"</p>
-</div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span></span> AI-Powered Gig Worker Protection</div>
+  <h1>
+    Income protection<br>
+    <span class="line2">for those who deliver.</span>
+  </h1>
+  <p class="hero-sub">
+    Real-time weather triggers. Instant UPI payouts. No paperwork.
+    Helix keeps gig workers covered when disruptions hit.
+  </p>
+  <div class="hero-cta">
+    <a href="/register" class="cta-primary">Start Coverage →</a>
+    <a href="/login" class="cta-secondary">Sign In</a>
+  </div>
+</section>
 
-<div class="gigworkers">
-  <h1>Work with confidence</h1>
-  <p>Helix protects your income during risks like heat, rain, and pollution.</p>
-
-  <div class="buttons">
-    <a href="/register">
-      <button class="primary">Register</button>
-    </a>
-
-    <a href="/login">
-      <button class="secondary">Login</button>
-    </a>
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stat-item">
+    <div class="stat-val">₹25</div>
+    <div class="stat-lbl">Starts from / week</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val">< 3min</div>
+    <div class="stat-lbl">Avg payout time</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val">3</div>
+    <div class="stat-lbl">Disruption triggers</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val">₹700</div>
+    <div class="stat-lbl">Max daily payout</div>
   </div>
 </div>
 
 <!-- FEATURES -->
-<div class="features">
-
-  <div class="card">
-    <h3>Smart Plans</h3>
-    <p>Flexible plans made for gig workers.</p>
+<div class="section">
+  <p class="section-label">Why Helix</p>
+  <h2 class="section-title">Built for the way you work</h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>Auto-Triggered Payouts</h3>
+      <p>Helix monitors real-time weather APIs. When rain exceeds 50mm, heat crosses 44°C, or AQI breaches 400 — your payout triggers automatically. No claim needed.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3>AI Fraud Detection</h3>
+      <p>Our Random Forest model analyzes claim patterns, zone consistency, and historical weather to verify every claim — protecting the fund for genuine workers.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📍</div>
+      <h3>Zone-Based Risk Scoring</h3>
+      <p>Premium is dynamically calculated based on your delivery zone, season, and live weather risk — so you pay a fair price based on actual conditions.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💳</div>
+      <h3>Instant UPI Transfer</h3>
+      <p>Approved payouts go straight to your UPI ID within minutes. No bank branches, no paperwork, no waiting weeks for settlement.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛡️</div>
+      <h3>Trust Score System</h3>
+      <p>Build your trust score over time with clean claims. Higher scores unlock faster approvals and priority processing for future claims.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💨</div>
+      <h3>Air Quality Coverage</h3>
+      <p>Delhi, Noida and NCR workers are covered for hazardous AQI events — a first in gig worker protection. Pollution is a real income risk.</p>
+    </div>
   </div>
-
-  <div class="card">
-    <h3>Fast Claims</h3>
-    <p>Quick payouts with no hassle.</p>
-  </div>
-
-  <div class="card">
-    <h3>Affordable</h3>
-    <p><span class="price">₹25–₹60/week</span> — simple & low-cost.</p>
-  </div>
-
 </div>
 
-<!-- SHORT STORY -->
-<div class="example">
-  <h3>Why Helix?</h3>
-  <p class="ex-text">
-    Delivery partners face daily risks. Helix ensures they don’t lose income when disruptions happen.
+<!-- PLANS -->
+<div class="section">
+  <p class="section-label">Pricing</p>
+  <h2 class="section-title">Simple, honest plans</h2>
+  <div class="plans-grid">
+    <div class="plan-card">
+      <p class="plan-name">Basic</p>
+      <p class="plan-price">₹25<span>/week</span></p>
+      <p class="plan-payout">▲ ₹300/day payout</p>
+      <ul class="plan-features">
+        <li>Rain & heat triggers</li>
+        <li>Manual claim option</li>
+        <li>UPI payout</li>
+      </ul>
+    </div>
+    <div class="plan-card featured">
+      <span class="plan-badge">MOST POPULAR</span>
+      <p class="plan-name">Standard</p>
+      <p class="plan-price">₹40<span>/week</span></p>
+      <p class="plan-payout">▲ ₹500/day payout</p>
+      <ul class="plan-features">
+        <li>All Basic triggers</li>
+        <li>AQI pollution cover</li>
+        <li>Priority processing</li>
+      </ul>
+    </div>
+    <div class="plan-card">
+      <p class="plan-name">Premium</p>
+      <p class="plan-price">₹60<span>/week</span></p>
+      <p class="plan-payout">▲ ₹700/day payout</p>
+      <ul class="plan-features">
+        <li>All Standard triggers</li>
+        <li>Highest trust priority</li>
+        <li>Max payout coverage</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- STORY -->
+<div class="story-box">
+  <div class="story-quote">"</div>
+  <p class="story-text">
+    Ravi, a Flipkart delivery partner in Dwarka, Delhi, lost 3 days of income during a record heatwave last summer.
+    No sick pay. No compensation. Just lost earnings.
   </p>
+  <p class="story-text">
+    <span class="story-highlight">With Helix Standard,</span> he'd have received ₹1,500 automatically —
+    triggered by the heat sensor the moment temperature crossed 44°C.
+    No calls, no forms, no rejection.
+  </p>
+  <p class="story-outcome">₹1,500 delivered to his UPI. Automatically. That's Helix.</p>
 </div>
+
+<footer>
+  <span>© 2025 Helix Insurance Technologies</span>
+  <span>AI-powered · UPI-first · Gig-native</span>
+</footer>
 
 </body>
 </html>

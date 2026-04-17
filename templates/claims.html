@@ -2,156 +2,289 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Helix - Claims</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claims — Helix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    body { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); min-height: 100vh; }
-    .trust-bar { height: 10px; border-radius: 6px; background: #374151; margin: 8px 0; }
-    .trust-fill { height: 10px; border-radius: 6px; }
+    :root {
+      --bg: #080f1a; --surface: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+      --accent: #38bdf8; --accent2: #818cf8; --text: #e2e8f0; --muted: #94a3b8;
+      --success: #34d399; --warning: #fbbf24; --danger: #f87171;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 80% 0%, rgba(129,140,248,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+      background: rgba(8,15,26,0.9); border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+    }
+    .topbar-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 2px;
+    }
+    .logo-sq {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .page { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; padding: 24px 16px 80px; }
+    .page-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 20px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 22px; margin-bottom: 16px; }
+    .card-title { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+
+    /* Trigger status grid */
+    .trigger-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .trigger-item { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+    .trigger-label { font-size: 10px; color: var(--muted); margin-bottom: 6px; }
+    .trigger-value { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .trigger-status { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 100px; display: inline-block; }
+    .triggered-badge { background: rgba(248,113,113,0.15); color: var(--danger); }
+    .ok-badge { background: rgba(52,211,153,0.15); color: var(--success); }
+
+    /* Trust */
+    .trust-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+    .trust-num { font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; }
+    .trust-badge { padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600; }
+    .progress-track { height: 8px; background: rgba(255,255,255,0.08); border-radius: 100px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 100px; }
+
+    /* Fraud */
+    .fraud-reasons { list-style: none; margin-top: 12px; }
+    .fraud-reasons li { font-size: 13px; color: var(--muted); padding: 7px 0; border-bottom: 1px solid var(--border); }
+    .fraud-reasons li:last-child { border-bottom: none; }
+    .fraud-conf { font-size: 13px; color: var(--muted); margin-top: 8px; }
+    .fraud-label {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    /* Claim history table */
+    .table-wrap { overflow-x: auto; border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead { background: rgba(255,255,255,0.06); }
+    th { padding: 10px 12px; text-align: left; color: var(--muted); font-weight: 600; font-size: 11px; letter-spacing: 0.5px; white-space: nowrap; }
+    td { padding: 10px 12px; border-top: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
+    td.amount { color: var(--success); font-weight: 600; }
+    .empty-msg { text-align: center; color: var(--muted); font-size: 14px; padding: 20px; }
+
+    /* Payout section */
+    .payout-section { text-align: center; }
+    .disruption-tag {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(251,191,36,0.1);
+      border: 1px solid rgba(251,191,36,0.3);
+      border-radius: 100px;
+      color: var(--warning);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .payout-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--success);
+      margin-bottom: 16px;
+    }
+    .payout-btn {
+      display: inline-block;
+      padding: 14px 36px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    .payout-btn.green { background: var(--success); color: #080f1a; }
+    .payout-btn.blue { background: var(--accent); color: #080f1a; }
+    .payout-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+    .trigger-hint { font-size: 11px; color: var(--muted); margin-top: 10px; }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      display: flex;
+      background: rgba(8,15,26,0.95); border-top: 1px solid var(--border); backdrop-filter: blur(20px);
+    }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      padding: 12px 8px; text-decoration: none; color: var(--muted);
+      font-size: 11px; gap: 4px; transition: color 0.2s;
+    }
+    .nav-item:hover, .nav-item.active { color: var(--accent); }
+    .nav-icon { font-size: 20px; }
   </style>
 </head>
 <body>
-<div class="max-w-2xl mx-auto p-4 pt-8 text-white">
 
-  <h1 class="text-2xl font-bold text-center text-cyan-400 mb-6">🔔 Claims Dashboard</h1>
+<div class="topbar">
+  <div class="topbar-brand"><div class="logo-sq">🛡</div> HELIX</div>
+  <span style="font-size:13px; color:var(--muted)">{{ worker[1] }}</span>
+</div>
+
+<div class="page">
+  <h1 class="page-title">🔔 Claims</h1>
 
   <!-- Policy Status -->
-  <div class="bg-white bg-opacity-10 rounded-2xl p-4 mb-4">
-    <p class="text-gray-300">Policy Status</p>
-    <p class="text-green-400 font-bold text-lg">Active ✅</p>
-    <p class="text-gray-400 text-sm mt-1">Plan: <strong class="text-white">{{ worker[6] }}</strong></p>
+  <div class="card">
+    <p class="card-title">Policy Status</p>
+    <div style="display:flex; justify-content:space-between; align-items:center">
+      <div>
+        <p style="font-size:18px; font-weight:700; color:var(--success)">Active ✅</p>
+        <p style="font-size:13px; color:var(--muted); margin-top:4px">Plan: <strong style="color:var(--text)">{{ worker[6] }}</strong></p>
+      </div>
+      <div style="text-align:right; font-size:13px; color:var(--muted)">
+        <p>Max payout:</p>
+        <p style="font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--success)">
+          ₹{% if "Basic" in worker[6] %}300{% elif "Standard" in worker[6] %}500{% else %}700{% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auto Trigger Status -->
+  <div class="card">
+    <p class="card-title">⚡ Auto Trigger Status</p>
+    <div class="trigger-grid">
+      <div class="trigger-item">
+        <p class="trigger-label">🌡️ Temperature</p>
+        <p class="trigger-value" style="color:{% if weather.temp > 44 %}var(--danger){% else %}var(--accent){% endif %}">{{ weather.temp }}°C</p>
+        <span class="trigger-status {% if weather.temp > 44 %}triggered-badge{% else %}ok-badge{% endif %}">
+          {% if weather.temp > 44 %}Triggered{% else %}Normal{% endif %}
+        </span>
+      </div>
+      <div class="trigger-item">
+        <p class="trigger-label">🌧️ Rainfall</p>
+        <p class="trigger-value" style="color:{% if weather.rainfall > 50 %}var(--danger){% else %}var(--accent){% endif %}">{{ weather.rainfall }}mm</p>
+        <span class="trigger-status {% if weather.rainfall > 50 %}triggered-badge{% else %}ok-badge{% endif %}">
+          {% if weather.rainfall > 50 %}Triggered{% else %}Normal{% endif %}
+        </span>
+      </div>
+      <div class="trigger-item">
+        <p class="trigger-label">💨 AQI</p>
+        <p class="trigger-value" style="color:{{ aqi_color }}">{{ weather.get('aqi', '--') }}</p>
+        <span class="trigger-status {% if weather.get('aqi', 0) > 400 %}triggered-badge{% else %}ok-badge{% endif %}">
+          {% if weather.get('aqi', 0) > 400 %}Triggered{% else %}Normal{% endif %}
+        </span>
+      </div>
+    </div>
+    <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center">
+      <span style="font-size:13px; color:var(--muted)">Overall Status</span>
+      <span style="font-weight:700; color:{% if claim_triggered %}var(--success){% else %}var(--danger){% endif %}">
+        {% if claim_triggered %}✅ Payout Triggered{% else %}❌ No Trigger{% endif %}
+      </span>
+    </div>
+    {% if claim_triggered %}
+    <p style="margin-top:8px; font-size:13px; color:var(--warning)">Reason: {{ disruption_type }}</p>
+    {% endif %}
   </div>
 
   <!-- Trust Score -->
-  <div class="bg-white bg-opacity-10 rounded-2xl p-4 mb-4">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-2">🛡️ Your Trust Score</h2>
+  <div class="card">
+    <p class="card-title">🛡️ Trust Score</p>
     {% set ts = trust_score %}
-    <p class="font-bold text-2xl {% if ts >= 70 %}text-green-400{% elif ts >= 40 %}text-yellow-400{% else %}text-red-400{% endif %}">
-      {{ ts }}/100 — {% if ts >= 70 %}🟢 Trusted{% elif ts >= 40 %}🟡 Watchlist{% else %}🔴 High Risk{% endif %}
-    </p>
-    <div class="trust-bar mt-2">
-      <div class="trust-fill" style="width:{{ ts }}%; background:{% if ts >= 70 %}#27ae60{% elif ts >= 40 %}#f39c12{% else %}#e74c3c{% endif %}"></div>
+    <div class="trust-row">
+      <div class="trust-num" style="color:{% if ts >= 70 %}var(--success){% elif ts >= 40 %}var(--warning){% else %}var(--danger){% endif %}">
+        {{ ts }}<span style="font-size:16px; color:var(--muted)">/100</span>
+      </div>
+      <span class="trust-badge" style="background:{% if ts >= 70 %}rgba(52,211,153,0.1){% elif ts >= 40 %}rgba(251,191,36,0.1){% else %}rgba(248,113,113,0.1){% endif %}; color:{% if ts >= 70 %}var(--success){% elif ts >= 40 %}var(--warning){% else %}var(--danger){% endif %}; border:1px solid {% if ts >= 70 %}rgba(52,211,153,0.25){% elif ts >= 40 %}rgba(251,191,36,0.25){% else %}rgba(248,113,113,0.25){% endif %}">
+        {% if ts >= 70 %}🟢 Trusted{% elif ts >= 40 %}🟡 Watchlist{% else %}🔴 High Risk{% endif %}
+      </span>
     </div>
-    <p class="text-xs text-gray-400 mt-1">Higher trust score = faster future approvals</p>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:{{ ts }}%; background:{% if ts >= 70 %}var(--success){% elif ts >= 40 %}var(--warning){% else %}var(--danger){% endif %}"></div>
+    </div>
+    <p style="font-size:12px; color:var(--muted); margin-top:8px">Higher trust = faster future approvals</p>
   </div>
 
-  <!-- Fraud Check -->
-  <div class="bg-white bg-opacity-10 rounded-2xl p-4 mb-4">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-2">🤖 AI Fraud Analysis</h2>
-    <p class="font-bold text-lg">{{ fraud_status }}</p>
-    <p class="text-sm text-gray-400">ML Confidence: {{ fraud_confidence }}%</p>
-    <ul class="mt-3 text-sm text-gray-300 list-disc pl-5 space-y-1">
+  <!-- Fraud Analysis -->
+  <div class="card">
+    <p class="card-title">🤖 AI Fraud Analysis</p>
+    <span class="fraud-label" style="background:{% if 'APPROVED' in fraud_status %}rgba(52,211,153,0.1){% elif 'REVIEW' in fraud_status %}rgba(251,191,36,0.1){% else %}rgba(248,113,113,0.1){% endif %}; color:{% if 'APPROVED' in fraud_status %}var(--success){% elif 'REVIEW' in fraud_status %}var(--warning){% else %}var(--danger){% endif %}; border:1px solid {% if 'APPROVED' in fraud_status %}rgba(52,211,153,0.2){% elif 'REVIEW' in fraud_status %}rgba(251,191,36,0.2){% else %}rgba(248,113,113,0.2){% endif %}">
+      {{ fraud_status }}
+    </span>
+    <p class="fraud-conf">ML Confidence: <strong style="color:var(--accent)">{{ fraud_confidence }}%</strong></p>
+    <ul class="fraud-reasons">
       {% for reason in fraud_reasons %}
-        <li>{{ reason }}</li>
+      <li>{{ reason }}</li>
       {% endfor %}
     </ul>
   </div>
 
-  <!-- Auto Trigger -->
-  <div class="bg-white bg-opacity-10 rounded-2xl p-4 mb-4">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-2">⚡ Auto Trigger Status</h2>
-    <div class="grid grid-cols-3 gap-2 text-sm mb-3">
-      <div class="bg-gray-800 rounded-xl p-2 text-center">
-        <p class="text-gray-400">🌡️ Temp</p>
-        <p class="font-bold text-white">{{ weather.temp }}°C</p>
-        <p class="text-xs {% if weather.temp > 44 %}text-red-400{% else %}text-green-400{% endif %}">
-          {% if weather.temp > 44 %}🔴 Triggered{% else %}✅ Normal{% endif %}
-        </p>
-      </div>
-      <div class="bg-gray-800 rounded-xl p-2 text-center">
-        <p class="text-gray-400">🌧️ Rain</p>
-        <p class="font-bold text-white">{{ weather.rainfall }}mm</p>
-        <p class="text-xs {% if weather.rainfall > 50 %}text-red-400{% else %}text-green-400{% endif %}">
-          {% if weather.rainfall > 50 %}🔴 Triggered{% else %}✅ Normal{% endif %}
-        </p>
-      </div>
-      <div class="bg-gray-800 rounded-xl p-2 text-center">
-        <p class="text-gray-400">💨 AQI</p>
-        <p class="font-bold" style="color:{{ aqi_color }}">{{ weather.get('aqi', '--') }}</p>
-        <p class="text-xs {% if weather.get('aqi', 0) > 400 %}text-red-400{% else %}text-green-400{% endif %}">
-          {% if weather.get('aqi', 0) > 400 %}🔴 Triggered{% else %}✅ Normal{% endif %}
-        </p>
-      </div>
-    </div>
-    <p class="text-sm">Overall Status:
-      <span class="font-bold {% if claim_triggered %}text-green-400{% else %}text-red-400{% endif %}">
-        {{ "✅ Payout Triggered" if claim_triggered else "❌ No Trigger" }}
-      </span>
-    </p>
+  <!-- Payout Action -->
+  <div class="card" style="text-align:center; padding:30px">
     {% if claim_triggered %}
-    <p class="text-sm text-yellow-300 mt-1">Reason: <strong>{{ disruption_type }}</strong></p>
+    <p style="color:var(--warning); font-size:14px; margin-bottom:12px; font-weight:500">⚠️ Active disruption — payout available now!</p>
+    <div class="disruption-tag">{{ disruption_type }}</div>
+    <p class="payout-amount">₹{% if "Basic" in worker[6] %}300{% elif "Standard" in worker[6] %}500{% else %}700{% endif %}</p>
+    <a href="/payout" class="payout-btn green">💸 Process Payout</a>
+    {% else %}
+    <p style="color:var(--muted); font-size:14px; margin-bottom:8px">No active weather disruption right now.</p>
+    <p class="payout-amount" style="font-size:32px; color:var(--accent)">₹{% if "Basic" in worker[6] %}300{% elif "Standard" in worker[6] %}500{% else %}700{% endif %}</p>
+    <a href="/payout" class="payout-btn blue">💸 Request Manual Payout</a>
+    <p class="trigger-hint">Auto-triggers: Rain > 50mm · Temp > 44°C · AQI > 400</p>
     {% endif %}
   </div>
 
   <!-- Claim History -->
-  <div class="bg-white bg-opacity-10 rounded-2xl p-4 mb-4">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-3">📋 Claim History</h2>
+  <div class="card">
+    <p class="card-title">📋 Claim History</p>
     {% if claim_history %}
-    <div class="overflow-x-auto">
-    <table class="w-full text-sm text-center border border-gray-600">
-      <thead class="bg-gray-700">
-        <tr>
-          <th class="p-2">ID</th>
-          <th class="p-2">Date</th>
-          <th class="p-2">Type</th>
-          <th class="p-2">Amount</th>
-          <th class="p-2">Temp</th>
-          <th class="p-2">Rain</th>
-          <th class="p-2">Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for claim in claim_history %}
-        <tr class="border-t border-gray-600">
-          <td class="p-2">#{{ claim[0] }}</td>
-          <td class="p-2">{{ claim[5] }}</td>
-          <td class="p-2">{{ claim[2] }}</td>
-          <td class="p-2 text-green-400">₹{{ claim[3] }}</td>
-          <td class="p-2 text-xs text-gray-400">{{ claim[6] or '--' }}°C</td>
-          <td class="p-2 text-xs text-gray-400">{{ claim[7] or '--' }}mm</td>
-          <td class="p-2">{{ claim[4] }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>Date</th><th>Type</th><th>Amount</th><th>Temp</th><th>Rain</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for claim in claim_history %}
+          <tr>
+            <td>#{{ claim[0] }}</td>
+            <td>{{ claim[5] }}</td>
+            <td>{{ claim[2] }}</td>
+            <td class="amount">₹{{ claim[3] }}</td>
+            <td>{{ claim[6] or '--' }}°C</td>
+            <td>{{ claim[7] or '--' }}mm</td>
+            <td style="color:{% if 'APPROVED' in claim[4] %}var(--success){% elif 'REVIEW' in claim[4] %}var(--warning){% else %}var(--danger){% endif %}; font-size:12px;">{{ claim[4] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
     {% else %}
-    <p class="text-gray-400">No claims yet.</p>
+    <p class="empty-msg">No claims yet — you're all clear!</p>
     {% endif %}
-  </div>
-
-  <!-- Payout -->
-  <div class="bg-white bg-opacity-10 rounded-2xl p-4 text-center mb-4">
-    {% if claim_triggered %}
-    <p class="text-yellow-300 font-semibold mb-2">⚠️ Active disruption detected — payout available!</p>
-    <p class="text-green-400 font-bold mb-1">Reason: {{ disruption_type }}</p>
-    <p class="text-green-400 font-bold mb-3">
-      Amount: ₹{% if "Basic" in worker[6] %}300{% elif "Standard" in worker[6] %}500{% else %}700{% endif %}
-    </p>
-    <a href="/payout" class="inline-block bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl text-white font-bold text-lg transition">
-      💸 Process Payout
-    </a>
-    {% else %}
-    <p class="text-gray-300 mb-1">No active weather disruption right now.</p>
-    <p class="text-xs text-gray-500 mb-3">Auto-triggers: Rainfall &gt; 50mm OR Temp &gt; 44°C OR AQI &gt; 400</p>
-    <p class="text-cyan-300 text-sm font-semibold mb-2">You can still manually request a payout:</p>
-    <p class="text-green-400 font-bold mb-3">
-      Amount: ₹{% if "Basic" in worker[6] %}300{% elif "Standard" in worker[6] %}500{% else %}700{% endif %}
-    </p>
-    <a href="/payout" class="inline-block bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-xl text-white font-bold text-lg transition">
-      💸 Request Manual Payout
-    </a>
-    {% endif %}
-  </div>
-
-  <!-- Navigation -->
-  <div class="flex flex-wrap justify-center gap-3 mt-2 mb-8">
-    <a href="/dashboard" class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-5 py-2 rounded-xl transition">🏠 Dashboard</a>
-    <a href="/policy" class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-5 py-2 rounded-xl transition">📄 Policy</a>
-    <a href="/financial" class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-5 py-2 rounded-xl transition">💰 Financial</a>
-    <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white font-semibold px-5 py-2 rounded-xl transition">🚪 Logout</a>
   </div>
 
 </div>
+
+<nav class="bottom-nav">
+  <a href="/dashboard" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
+  <a href="/claims" class="nav-item active"><span class="nav-icon">🔔</span>Claims</a>
+  <a href="/policy" class="nav-item"><span class="nav-icon">📄</span>Policy</a>
+  <a href="/financial" class="nav-item"><span class="nav-icon">💰</span>Financial</a>
+</nav>
+
 </body>
 </html>

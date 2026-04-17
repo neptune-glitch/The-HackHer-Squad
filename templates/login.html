@@ -1,37 +1,209 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login - Helix</title>
-  <link rel="stylesheet" href="/static/loginstyle.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Helix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080f1a;
+      --surface: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.09);
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --error: #f87171;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 30% 20%, rgba(56,189,248,0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 70% 70%, rgba(129,140,248,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+    .card {
+      position: relative;
+      z-index: 1;
+      width: min(420px, calc(100vw - 32px));
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(56,189,248,0.05);
+    }
+    .card-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 14px;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .field {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 13px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+      outline: none;
+    }
+    input:focus {
+      border-color: var(--accent);
+      background: rgba(56,189,248,0.05);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.1);
+    }
+    input::placeholder { color: rgba(148,163,184,0.5); }
+    .forgot {
+      text-align: right;
+      margin-top: 8px;
+    }
+    .forgot a {
+      font-size: 12px;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #080f1a;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 30px rgba(56,189,248,0.35);
+    }
+    .error-msg {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.2);
+      border-radius: 8px;
+      color: var(--error);
+      font-size: 13px;
+      text-align: center;
+    }
+    .footer-text {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .footer-text a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .back-home {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+    .back-home:hover { color: var(--text); }
+  </style>
 </head>
 <body>
-
-<div class="form">
-  <h2>Welcome Back </h2>
-  <p class="subtitle">Sign in to continue.</p>
-
+<a href="/" class="back-home">← Home</a>
+<div class="card">
+  <div class="card-header">
+    <div class="logo">🛡</div>
+    <h1>Welcome back</h1>
+    <p class="subtitle">Sign in to your Helix account</p>
+  </div>
   <form method="POST" action="/login">
-    <input type="text" name="phone" 
-           placeholder="Phone Number" required>
-
-    <input type="password" name="password" 
-           placeholder="Password" required>
-
-    <div class="forgot">
-      <a href="#">Forgot Password?</a>
+    <div class="field">
+      <label>Phone Number</label>
+      <input type="text" name="phone" placeholder="Enter your phone number" required>
     </div>
-
-    <button class="btn" type="submit">Login</button>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" name="password" placeholder="Enter your password" required>
+      <div class="forgot"><a href="#">Forgot password?</a></div>
+    </div>
+    <button class="btn" type="submit">Sign In →</button>
   </form>
-
   {% if error %}
-  <p style="color:#ff6b6b; margin-top:14px; font-size:14px;">⚠️ {{ error }}</p>
+  <div class="error-msg">⚠️ {{ error }}</div>
   {% endif %}
-
-  <p class="bottom-text">
-    New here? <a href="/register">Register</a>
+  <p class="footer-text">
+    Don't have an account? <a href="/register">Register now</a>
   </p>
 </div>
-
 </body>
 </html>

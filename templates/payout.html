@@ -1,100 +1,179 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Payout - Helix</title>
-  <link rel="stylesheet" href="/static/homestyle.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payout — Helix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    .container { max-width: 600px; margin: 30px auto; padding: 20px; }
-    .card { background: rgba(255,255,255,0.08); padding: 30px; margin: 15px 0; border-radius: 12px; text-align: center; }
-    .amount { font-size: 52px; font-weight: bold; color: #27ae60; margin: 20px 0; }
-    .btn { background: linear-gradient(135deg, #00c6ff, #0072ff); color: white; padding: 15px 40px; border: none; border-radius: 10px; font-size: 18px; cursor: pointer; width: 100%; margin-top: 15px; }
-    .btn:hover { opacity: 0.9; transform: translateY(-2px); }
-    .upi-box { background: rgba(0,170,255,0.1); border: 1px solid #00aaff; border-radius: 10px; padding: 15px; margin: 15px 0; }
-    .processing { display: none; color: #f39c12; font-size: 16px; margin: 15px 0; line-height: 2; }
-    .nav-links { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
-    .nav-links a { background: #00aaff; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; }
-    .plan-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; background: rgba(0,170,255,0.15); border: 1px solid #00aaff; color: #00aaff; margin: 6px 0; }
-    .step { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); color: #d1d5db; font-size: 14px; }
-    .step-icon { font-size: 20px; width: 30px; text-align: center; }
-    .step-done { color: #27ae60; }
+    :root {
+      --bg: #080f1a; --surface: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+      --accent: #38bdf8; --accent2: #818cf8; --text: #e2e8f0; --muted: #94a3b8;
+      --success: #34d399; --warning: #fbbf24; --danger: #f87171;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: radial-gradient(ellipse 60% 60% at 50% 30%, rgba(52,211,153,0.08) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px; background: rgba(8,15,26,0.9); border-bottom: 1px solid var(--border); backdrop-filter: blur(20px);
+    }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 2px; }
+    .logo-sq { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .page { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 32px 16px 40px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 16px; }
+
+    /* Main payout card */
+    .payout-main { text-align: center; padding: 40px 32px; }
+    .payout-icon { font-size: 48px; margin-bottom: 12px; }
+    .payout-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+    .disruption-tag {
+      display: inline-block; padding: 6px 18px;
+      background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3);
+      border-radius: 100px; color: var(--warning); font-size: 13px; font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .plan-tag {
+      display: inline-block; padding: 4px 14px;
+      background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25);
+      border-radius: 100px; color: var(--accent); font-size: 12px; font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .amount-display {
+      font-family: 'Syne', sans-serif; font-size: 68px; font-weight: 800;
+      color: var(--success); line-height: 1; margin-bottom: 8px;
+    }
+    .upi-row {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin: 20px 0; text-align: left;
+    }
+    .upi-label { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; margin-bottom: 6px; }
+    .upi-val { font-size: 18px; font-weight: 600; color: var(--text); }
+    .upi-note { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* Processing steps */
+    .steps { display: flex; flex-direction: column; gap: 0; margin: 20px 0; }
+    .step {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+      font-size: 14px; color: var(--muted);
+      transition: color 0.4s;
+    }
+    .step:last-child { border-bottom: none; }
+    .step-icon { font-size: 18px; width: 28px; text-align: center; }
+    .step.step-done { color: var(--success); }
+    #processing { display: none; }
+    #processing.visible { display: block; }
+
+    /* Button */
+    .pay-btn {
+      width: 100%; padding: 16px;
+      background: var(--success); border: none; border-radius: 14px;
+      color: #080f1a; font-size: 17px; font-weight: 700;
+      font-family: 'DM Sans', sans-serif; cursor: pointer;
+      transition: all 0.2s; letter-spacing: 0.3px;
+    }
+    .pay-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(52,211,153,0.4); }
+
+    /* Weather snapshot */
+    .weather-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 4px; }
+    .weather-item { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+    .weather-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+    .weather-val { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--accent); }
+    .card-title { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+
+    .nav-row { display: flex; gap: 10px; margin-top: 8px; }
+    .nav-btn { flex: 1; padding: 12px; text-align: center; border: 1px solid var(--border); border-radius: 10px; color: var(--muted); text-decoration: none; font-size: 14px; transition: all 0.2s; }
+    .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
   </style>
   <script>
     function processPayout() {
       document.getElementById('payBtn').style.display = 'none';
-      document.getElementById('processing').style.display = 'block';
-      // Animate steps
-      let steps = ['step1','step2','step3','step4'];
+      document.getElementById('processing').classList.add('visible');
+      const steps = ['step1', 'step2', 'step3', 'step4'];
       steps.forEach((id, i) => {
         setTimeout(() => {
-          let el = document.getElementById(id);
-          if (el) el.classList.add('step-done');
-        }, i * 600);
+          document.getElementById(id)?.classList.add('step-done');
+        }, i * 650);
       });
-      setTimeout(function() {
+      setTimeout(() => {
         document.getElementById('payForm').submit();
-      }, 2800);
+      }, 3000);
     }
   </script>
 </head>
 <body>
-<div class="navbar">
-  <img src="https://png.pngtree.com/png-vector/20250422/ourmid/pngtree-blue-shield-badge-clipart-illustration-png-image_16042877.png" alt="logo">
-  <h2>HELIX — INSTANT PAYOUT</h2>
+
+<div class="topbar">
+  <div class="topbar-brand"><div class="logo-sq">🛡</div> HELIX</div>
+  <span style="font-size:13px; color:var(--muted)">Instant Payout</span>
 </div>
 
-<div class="container">
-  <div class="card">
-    <h2 style="color:#00aaff">💸 Claim Payout</h2>
-    <p style="color:#aaa">Disruption: <strong style="color:white">{{ disruption_type }}</strong></p>
-    <p><span class="plan-badge">{{ worker[6] }}</span></p>
+<div class="page">
+  <div class="card payout-main">
+    <div class="payout-icon">💸</div>
+    <h1 class="payout-title">Claim Your Payout</h1>
+    <div class="disruption-tag">{{ disruption_type }}</div>
+    <br>
+    <div class="plan-tag">{{ worker[6] }}</div>
+    <div class="amount-display">₹{{ payout_amount }}</div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px">Ready to transfer</p>
 
-    <div class="amount">₹{{ payout_amount }}</div>
-
-    <div class="upi-box">
-      <p style="color:#aaa; font-size:13px;">Sending to UPI:</p>
-      <p style="color:white; font-size:18px; font-weight:bold;">{{ worker[4] }}</p>
-      <p style="color:#aaa; font-size:12px;">Via Razorpay Test Mode (Simulated)</p>
+    <div class="upi-row">
+      <p class="upi-label">SENDING TO UPI</p>
+      <p class="upi-val">{{ worker[4] }}</p>
+      <p class="upi-note">Via Razorpay · Simulated Test Mode</p>
     </div>
 
-    <!-- Simulated processing steps -->
-    <div id="processing" class="processing">
-      <div class="step" id="step1">
-        <span class="step-icon">🔐</span> Verifying identity & policy...
-      </div>
-      <div class="step" id="step2">
-        <span class="step-icon">🌦️</span> Confirming disruption with weather API...
-      </div>
-      <div class="step" id="step3">
-        <span class="step-icon">🤖</span> Running fraud detection model...
-      </div>
-      <div class="step" id="step4">
-        <span class="step-icon">💳</span> Sending ₹{{ payout_amount }} to {{ worker[4] }}...
+    <div id="processing">
+      <div class="steps">
+        <div class="step" id="step1"><span class="step-icon">🔐</span> Verifying identity & policy...</div>
+        <div class="step" id="step2"><span class="step-icon">🌦️</span> Confirming disruption with weather API...</div>
+        <div class="step" id="step3"><span class="step-icon">🤖</span> Running fraud detection model...</div>
+        <div class="step" id="step4"><span class="step-icon">💳</span> Sending ₹{{ payout_amount }} to {{ worker[4] }}...</div>
       </div>
     </div>
 
     <form id="payForm" method="POST" action="/process_payout">
       <input type="hidden" name="disruption_type" value="{{ disruption_type }}">
-      <button type="button" class="btn" id="payBtn" onclick="processPayout()">
+      <button type="button" class="pay-btn" id="payBtn" onclick="processPayout()">
         💳 Process Instant Payout
       </button>
     </form>
   </div>
 
-  <!-- Weather snapshot at claim time -->
-  <div class="card" style="background: rgba(0,100,200,0.1); border: 1px solid #00aaff;">
-    <h3 style="color:#00aaff; margin-bottom: 12px;">📸 Weather Snapshot (Stored at Claim)</h3>
-    <p style="color:#d1d5db;">🌡️ Temp: <strong>{{ weather.temp }}°C</strong></p>
-    <p style="color:#d1d5db;">🌧️ Rainfall: <strong>{{ weather.rainfall }}mm</strong></p>
-    <p style="color:#d1d5db;">💨 AQI: <strong>{{ weather.get('aqi', '--') }}</strong></p>
-    <p style="color:#aaa; font-size:12px; margin-top:8px;">
-      ✅ This snapshot is stored immutably with your claim for tamper-proof verification.
+  <!-- Weather Snapshot -->
+  <div class="card">
+    <p class="card-title">📸 Weather Snapshot at Claim Time</p>
+    <div class="weather-grid">
+      <div class="weather-item">
+        <p class="weather-label">🌡️ Temp</p>
+        <p class="weather-val">{{ weather.temp }}°C</p>
+      </div>
+      <div class="weather-item">
+        <p class="weather-label">🌧️ Rain</p>
+        <p class="weather-val">{{ weather.rainfall }}mm</p>
+      </div>
+      <div class="weather-item">
+        <p class="weather-label">💨 AQI</p>
+        <p class="weather-val">{{ weather.get('aqi', '--') }}</p>
+      </div>
+    </div>
+    <p style="font-size:11px; color:var(--muted); margin-top:12px; text-align:center">
+      ✅ Snapshot stored immutably for tamper-proof verification
     </p>
   </div>
 
-  <div class="nav-links">
-    <a href="/dashboard">🏠 Dashboard</a>
-    <a href="/claims">🔔 Claims</a>
+  <div class="nav-row">
+    <a href="/dashboard" class="nav-btn">🏠 Dashboard</a>
+    <a href="/claims" class="nav-btn">🔔 Claims</a>
   </div>
 </div>
+
 </body>
 </html>
