@@ -47,24 +47,28 @@
       <thead class="bg-gray-700">
         <tr>
           <th class="p-2">Month</th>
-          <th class="p-2">Premium</th>
-          <th class="p-2">Claims</th>
+          <th class="p-2">Est. Premium</th>
+          <th class="p-2">Claims Paid</th>
           <th class="p-2">P/L</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="border-t border-gray-600">
-          <td class="p-2">April</td>
-          <td class="p-2">₹50,000</td>
-          <td class="p-2">₹35,000</td>
-          <td class="p-2 text-green-400">+₹15,000</td>
-        </tr>
-        <tr class="border-t border-gray-600">
-          <td class="p-2">May</td>
-          <td class="p-2">₹52,000</td>
-          <td class="p-2">₹48,000</td>
-          <td class="p-2 text-green-400">+₹4,000</td>
-        </tr>
+        {% if monthly_performance %}
+          {% for row in monthly_performance %}
+          <tr class="border-t border-gray-600">
+            <td class="p-2">{{ row.month }}</td>
+            <td class="p-2">₹{{ row.premium }}</td>
+            <td class="p-2">₹{{ row.claims }}</td>
+            <td class="p-2 {% if row.positive %}text-green-400{% else %}text-red-400{% endif %}">
+              {% if row.positive %}+{% endif %}₹{{ row.pl }}
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr class="border-t border-gray-600">
+            <td colspan="4" class="p-3 text-gray-400">No approved claims recorded yet.</td>
+          </tr>
+        {% endif %}
       </tbody>
     </table>
   </div>

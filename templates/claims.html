@@ -4,37 +4,43 @@
   <meta charset="UTF-8">
   <title>Helix - Claims</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
-    body {
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      min-height: 100vh;
-    }
+    body { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); min-height: 100vh; }
+    .trust-bar { height: 10px; border-radius: 6px; background: #374151; margin: 8px 0; }
+    .trust-fill { height: 10px; border-radius: 6px; }
   </style>
 </head>
-
 <body>
-
 <div class="max-w-2xl mx-auto p-4 pt-8 text-white">
 
-  <h1 class="text-2xl font-bold text-center text-cyan-400 mb-6">
-    🔔 Claims Dashboard
-  </h1>
+  <h1 class="text-2xl font-bold text-center text-cyan-400 mb-6">🔔 Claims Dashboard</h1>
 
   <!-- Policy Status -->
   <div class="bg-white bg-opacity-10 rounded-2xl p-4 mb-4">
     <p class="text-gray-300">Policy Status</p>
     <p class="text-green-400 font-bold text-lg">Active ✅</p>
+    <p class="text-gray-400 text-sm mt-1">Plan: <strong class="text-white">{{ worker[6] }}</strong></p>
+  </div>
+
+  <!-- Trust Score -->
+  <div class="bg-white bg-opacity-10 rounded-2xl p-4 mb-4">
+    <h2 class="text-lg font-semibold text-cyan-300 mb-2">🛡️ Your Trust Score</h2>
+    {% set ts = trust_score %}
+    <p class="font-bold text-2xl {% if ts >= 70 %}text-green-400{% elif ts >= 40 %}text-yellow-400{% else %}text-red-400{% endif %}">
+      {{ ts }}/100 — {% if ts >= 70 %}🟢 Trusted{% elif ts >= 40 %}🟡 Watchlist{% else %}🔴 High Risk{% endif %}
+    </p>
+    <div class="trust-bar mt-2">
+      <div class="trust-fill" style="width:{{ ts }}%; background:{% if ts >= 70 %}#27ae60{% elif ts >= 40 %}#f39c12{% else %}#e74c3c{% endif %}"></div>
+    </div>
+    <p class="text-xs text-gray-400 mt-1">Higher trust score = faster future approvals</p>
   </div>
 
   <!-- Fraud Check -->
   <div class="bg-white bg-opacity-10 rounded-2xl p-4 mb-4">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-2">Fraud Check</h2>
-    
+    <h2 class="text-lg font-semibold text-cyan-300 mb-2">🤖 AI Fraud Analysis</h2>
     <p class="font-bold text-lg">{{ fraud_status }}</p>
-    <p class="text-sm text-gray-400">Confidence: {{ fraud_confidence }}%</p>
-
-    <ul class="mt-3 text-sm text-gray-300 list-disc pl-5">
+    <p class="text-sm text-gray-400">ML Confidence: {{ fraud_confidence }}%</p>
+    <ul class="mt-3 text-sm text-gray-300 list-disc pl-5 space-y-1">
       {% for reason in fraud_reasons %}
         <li>{{ reason }}</li>
       {% endfor %}
@@ -43,38 +49,45 @@
 
   <!-- Auto Trigger -->
   <div class="bg-white bg-opacity-10 rounded-2xl p-4 mb-4">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-2">Auto Trigger</h2>
-
-    <p><strong>Temperature:</strong> {{ weather.temp }}°C</p>
-    <p><strong>Rainfall:</strong> {{ weather.rainfall }} mm</p>
-
-    <p class="mt-2">
-      Status:
-      <span class="font-bold 
-        {% if claim_triggered %}text-green-400{% else %}text-red-400{% endif %}">
-        {{ "✅ Triggered" if claim_triggered else "❌ Not Triggered" }}
+    <h2 class="text-lg font-semibold text-cyan-300 mb-2">⚡ Auto Trigger Status</h2>
+    <div class="grid grid-cols-3 gap-2 text-sm mb-3">
+      <div class="bg-gray-800 rounded-xl p-2 text-center">
+        <p class="text-gray-400">🌡️ Temp</p>
+        <p class="font-bold text-white">{{ weather.temp }}°C</p>
+        <p class="text-xs {% if weather.temp > 44 %}text-red-400{% else %}text-green-400{% endif %}">
+          {% if weather.temp > 44 %}🔴 Triggered{% else %}✅ Normal{% endif %}
+        </p>
+      </div>
+      <div class="bg-gray-800 rounded-xl p-2 text-center">
+        <p class="text-gray-400">🌧️ Rain</p>
+        <p class="font-bold text-white">{{ weather.rainfall }}mm</p>
+        <p class="text-xs {% if weather.rainfall > 50 %}text-red-400{% else %}text-green-400{% endif %}">
+          {% if weather.rainfall > 50 %}🔴 Triggered{% else %}✅ Normal{% endif %}
+        </p>
+      </div>
+      <div class="bg-gray-800 rounded-xl p-2 text-center">
+        <p class="text-gray-400">💨 AQI</p>
+        <p class="font-bold" style="color:{{ aqi_color }}">{{ weather.get('aqi', '--') }}</p>
+        <p class="text-xs {% if weather.get('aqi', 0) > 400 %}text-red-400{% else %}text-green-400{% endif %}">
+          {% if weather.get('aqi', 0) > 400 %}🔴 Triggered{% else %}✅ Normal{% endif %}
+        </p>
+      </div>
+    </div>
+    <p class="text-sm">Overall Status:
+      <span class="font-bold {% if claim_triggered %}text-green-400{% else %}text-red-400{% endif %}">
+        {{ "✅ Payout Triggered" if claim_triggered else "❌ No Trigger" }}
       </span>
     </p>
+    {% if claim_triggered %}
+    <p class="text-sm text-yellow-300 mt-1">Reason: <strong>{{ disruption_type }}</strong></p>
+    {% endif %}
   </div>
 
-  <!-- Claim Trigger Alert -->
-  {% if claim_triggered %}
-  <div class="bg-yellow-500 bg-opacity-20 border border-yellow-400 rounded-2xl p-4 mb-4">
-    <h2 class="font-semibold text-lg text-yellow-300">
-      ⚠️ Claim Auto-Triggered!
-    </h2>
-    <p><strong>Reason:</strong> {{ disruption_type }}</p>
-    <p class="text-green-400 font-bold mt-2">
-      ₹500 will be credited
-    </p>
-  </div>
-  {% endif %}
-
-  <!-- History -->
+  <!-- Claim History -->
   <div class="bg-white bg-opacity-10 rounded-2xl p-4 mb-4">
-    <h2 class="text-lg font-semibold text-cyan-300 mb-3">Claim History</h2>
-
+    <h2 class="text-lg font-semibold text-cyan-300 mb-3">📋 Claim History</h2>
     {% if claim_history %}
+    <div class="overflow-x-auto">
     <table class="w-full text-sm text-center border border-gray-600">
       <thead class="bg-gray-700">
         <tr>
@@ -82,6 +95,8 @@
           <th class="p-2">Date</th>
           <th class="p-2">Type</th>
           <th class="p-2">Amount</th>
+          <th class="p-2">Temp</th>
+          <th class="p-2">Rain</th>
           <th class="p-2">Status</th>
         </tr>
       </thead>
@@ -91,35 +106,52 @@
           <td class="p-2">#{{ claim[0] }}</td>
           <td class="p-2">{{ claim[5] }}</td>
           <td class="p-2">{{ claim[2] }}</td>
-          <td class="p-2">₹{{ claim[3] }}</td>
-          <td class="p-2 text-green-400">{{ claim[4] }}</td>
+          <td class="p-2 text-green-400">₹{{ claim[3] }}</td>
+          <td class="p-2 text-xs text-gray-400">{{ claim[6] or '--' }}°C</td>
+          <td class="p-2 text-xs text-gray-400">{{ claim[7] or '--' }}mm</td>
+          <td class="p-2">{{ claim[4] }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+    </div>
     {% else %}
-      <p class="text-gray-400">No claims yet.</p>
+    <p class="text-gray-400">No claims yet.</p>
     {% endif %}
   </div>
 
   <!-- Payout -->
-  <div class="bg-white bg-opacity-10 rounded-2xl p-4 text-center">
-    <button onclick="simulatePayout()"
-      class="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-xl">
-      Process Payout
-    </button>
+  <div class="bg-white bg-opacity-10 rounded-2xl p-4 text-center mb-4">
+    {% if claim_triggered %}
+    <p class="text-yellow-300 font-semibold mb-2">⚠️ Active disruption detected — payout available!</p>
+    <p class="text-green-400 font-bold mb-1">Reason: {{ disruption_type }}</p>
+    <p class="text-green-400 font-bold mb-3">
+      Amount: ₹{% if "Basic" in worker[6] %}300{% elif "Standard" in worker[6] %}500{% else %}700{% endif %}
+    </p>
+    <a href="/payout" class="inline-block bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl text-white font-bold text-lg transition">
+      💸 Process Payout
+    </a>
+    {% else %}
+    <p class="text-gray-300 mb-1">No active weather disruption right now.</p>
+    <p class="text-xs text-gray-500 mb-3">Auto-triggers: Rainfall &gt; 50mm OR Temp &gt; 44°C OR AQI &gt; 400</p>
+    <p class="text-cyan-300 text-sm font-semibold mb-2">You can still manually request a payout:</p>
+    <p class="text-green-400 font-bold mb-3">
+      Amount: ₹{% if "Basic" in worker[6] %}300{% elif "Standard" in worker[6] %}500{% else %}700{% endif %}
+    </p>
+    <a href="/payout" class="inline-block bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-xl text-white font-bold text-lg transition">
+      💸 Request Manual Payout
+    </a>
+    {% endif %}
+  </div>
 
-    <p id="msg" class="mt-3 text-green-400"></p>
+  <!-- Navigation -->
+  <div class="flex flex-wrap justify-center gap-3 mt-2 mb-8">
+    <a href="/dashboard" class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-5 py-2 rounded-xl transition">🏠 Dashboard</a>
+    <a href="/policy" class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-5 py-2 rounded-xl transition">📄 Policy</a>
+    <a href="/financial" class="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold px-5 py-2 rounded-xl transition">💰 Financial</a>
+    <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white font-semibold px-5 py-2 rounded-xl transition">🚪 Logout</a>
   </div>
 
 </div>
-
-<script>
-function simulatePayout() {
-  document.getElementById("msg").innerText =
-    "✅ Demo payout successful!";
-}
-</script>
-
 </body>
 </html>

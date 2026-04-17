@@ -1,49 +1,158 @@
-<div class="card">
-  <h2>👷 Total Workers ({{ total_workers }})</h2>
-  <table>
-    <tr>
-      <th>Name</th>
-      <th>Zone</th>
-    </tr>
-
-    {% for w in all_workers %}
-    <tr>
-      <td>{{ w[1] }}</td>
-      <td>{{ w[3] }}</td>
-    </tr>
-    {% endfor %}
-  </table>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard - Helix</title>
+  <link rel="stylesheet" href="/static/homestyle.css">
+  <style>
+    .container { max-width: 1100px; margin: 30px auto; padding: 20px; }
+    .card { background: rgba(255,255,255,0.08); padding: 25px; margin: 15px 0; border-radius: 12px; }
+    .card h2 { color: #00aaff; margin-bottom: 15px; }
+    .card p { color: #d1d5db; margin: 8px 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 15px; margin: 15px 0; }
+    .stat-box { background: rgba(0,170,255,0.1); border: 1px solid #00aaff; border-radius: 10px; padding: 20px; text-align: center; }
+    .stat-number { font-size: 36px; font-weight: bold; color: #00aaff; }
+    .stat-label { color: #aaa; font-size: 12px; margin-top: 5px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: rgba(0,170,255,0.2); color: #00aaff; padding: 12px; text-align: left; font-size: 13px; }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); color: #d1d5db; font-size: 13px; }
+    .progress-bar { height: 10px; background: #333; border-radius: 5px; margin: 8px 0; }
+    .progress-fill { height: 10px; border-radius: 5px; }
+    .nav-links { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+    .nav-links a { background: #00aaff; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; }
+    .nav-links a.orange { background: #e67e22; }
+    .trust-mini { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+    .aqi-banner { background: rgba(142,68,173,0.2); border: 1px solid #8e44ad; border-radius: 12px; padding: 15px; margin: 10px 0; }
+    @media(max-width:600px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+  </style>
+</head>
+<body>
+<div class="navbar">
+  <img src="https://png.pngtree.com/png-vector/20250422/ourmid/pngtree-blue-shield-badge-clipart-illustration-png-image_16042877.png" alt="logo">
+  <h2>HELIX — INSURER DASHBOARD</h2>
 </div>
 
-<div class="card">
-  <h2>📄 Claims</h2>
-  <table>
-    <tr>
-      <th>ID</th>
-      <th>Worker ID</th>
-      <th>Type</th>
-      <th>Status</th>
-    </tr>
+<div class="container">
 
-    {% for c in all_claims %}
-    <tr>
-      <td>#{{ c[0] }}</td>
-      <td>{{ c[1] }}</td>
-      <td>{{ c[2] }}</td>
-      <td class="green">{{ c[4] }}</td>
-    </tr>
-    {% endfor %}
-  </table>
-</div>
+  <!-- Key Stats -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-number">{{ total_workers }}</div>
+      <div class="stat-label">Workers Enrolled</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number" style="color:#f39c12">₹{{ weekly_premium }}</div>
+      <div class="stat-label">Weekly Premium</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number" style="color:#e74c3c">{{ total_claims }}</div>
+      <div class="stat-label">Total Claims</div>
+    </div>
+    <div class="stat-box" style="border-color:{% if profit > 0 %}#27ae60{% else %}#e74c3c{% endif %}">
+      <div class="stat-number" style="color:{% if profit > 0 %}#27ae60{% else %}#e74c3c{% endif %}">
+        ₹{{ profit }}
+      </div>
+      <div class="stat-label">Weekly Profit</div>
+    </div>
+  </div>
 
-<div class="card">
-  <h2>💰 Weekly Finance</h2>
-  <p>Premium Collected: ₹{{ weekly_premium }}</p>
-  <p>Payouts: ₹{{ total_payouts }}</p>
-  <h3>Profit: ₹{{ profit }}</h3>
-</div>
+  <!-- Loss Ratio -->
+  <div class="card">
+    <h2>📊 Loss Ratio Analysis</h2>
+    <p>Loss Ratio: <strong style="color:{% if loss_ratio > 70 %}#e74c3c{% else %}#27ae60{% endif %}">
+      {{ loss_ratio }}%
+    </strong></p>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:{{ [loss_ratio, 100]|min }}%; background:{% if loss_ratio > 70 %}#e74c3c{% else %}#27ae60{% endif %}"></div>
+    </div>
+    <p style="color:#aaa; font-size:13px;">
+      {% if loss_ratio > 70 %}⚠️ High loss ratio — consider adjusting premiums{% else %}✅ Sustainable loss ratio — business viable{% endif %}
+    </p>
+  </div>
 
-<div class="card">
-  <h2>📊 Risk Prediction</h2>
-  <p>{{ next_week_risk }}</p>
+  <!-- Next Week Prediction -->
+  <div class="card" style="background: rgba(138,43,226,0.1); border: 1px solid #8e44ad;">
+    <h2 style="color:#f39c12">🔮 Next Week Predictive Analytics</h2>
+    <p>📍 Current Weather: <strong>{{ weather['temp'] }}°C — {{ weather['description'] }}</strong></p>
+    <p>🌧️ Rainfall: <strong>{{ weather['rainfall'] }}mm</strong></p>
+
+    <!-- AQI Section -->
+    <div class="aqi-banner">
+      <p>💨 Air Quality Index: <strong style="color:{{ aqi_color }}">{{ weather.get('aqi', '--') }} — {{ aqi_text }}</strong></p>
+      {% if weather.get('aqi', 0) > 400 %}
+      <p style="color:#e74c3c; font-weight:bold; margin-top:6px;">
+        🚨 Hazardous AQI — Pollution payouts may trigger this week!
+      </p>
+      {% elif weather.get('aqi', 0) > 200 %}
+      <p style="color:#f39c12; margin-top:6px;">⚠️ Unhealthy AQI levels — monitor closely</p>
+      {% else %}
+      <p style="color:#27ae60; margin-top:6px;">✅ AQI levels acceptable — no pollution trigger expected</p>
+      {% endif %}
+    </div>
+
+    <p>📊 Predicted Risk: <strong>{{ next_week_risk }}</strong></p>
+    <p style="color:#aaa; font-size:13px; margin-top:10px;">
+      Based on Random Forest model analyzing temperature, rainfall, AQI and seasonal patterns
+    </p>
+    {% if weather['temp'] > 40 %}
+    <p style="color:#e74c3c; margin-top:10px;">⚠️ Expect ~{{ (total_workers // 5) }} claims next week due to heat</p>
+    {% else %}
+    <p style="color:#27ae60; margin-top:10px;">✅ Low claim volume expected next week</p>
+    {% endif %}
+  </div>
+
+  <!-- Workers Coverage with Trust Scores -->
+  <div class="card">
+    <h2>👥 Active Workers Coverage</h2>
+    <table>
+      <tr>
+        <th>Name</th><th>Zone</th><th>Platform</th><th>Plan</th><th>Trust</th><th>Coverage</th>
+      </tr>
+      {% for w in all_workers %}
+      <tr>
+        <td>{{ w[1] }}</td>
+        <td>{{ w[3] }}</td>
+        <td>{{ w[5] }}</td>
+        <td>{{ w[6] }}</td>
+        <td>
+          <span class="trust-mini" style="background:rgba(39,174,96,0.2); color:#27ae60; border:1px solid #27ae60;">
+            🟢 —
+          </span>
+        </td>
+        <td style="color:#27ae60">✅ Active</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <!-- Claims Table -->
+  <div class="card">
+    <h2>🔔 Recent Claims (with Weather Snapshot)</h2>
+    <table>
+      <tr>
+        <th>ID</th><th>Worker</th><th>Disruption</th><th>Amount</th><th>Status</th><th>Date</th>
+      </tr>
+      {% for c in all_claims %}
+      <tr>
+        <td>{{ c[0] }}</td>
+        <td>{{ c[1] }}</td>
+        <td>{{ c[2] }}</td>
+        <td>₹{{ c[3] }}</td>
+        <td style="color:{% if 'APPROVED' in c[4] %}#27ae60{% elif 'REVIEW' in c[4] %}#f39c12{% else %}#e74c3c{% endif %}">{{ c[4] }}</td>
+        <td>{{ c[5] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="nav-links">
+    <a href="/">🏠 Home</a>
+    <form method="POST" action="/admin/retrain" style="display:inline;">
+      <button type="submit" style="background:#e67e22; color:white; padding:10px 18px; border-radius:8px; border:none; cursor:pointer; font-size:14px;">
+        🔄 Retrain ML Models
+      </button>
+    </form>
+  </div>
+
 </div>
+</body>
+</html>

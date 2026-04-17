@@ -24,6 +24,10 @@
     <button class="btn" type="submit">Login</button>
   </form>
 
+  {% if error %}
+  <p style="color:#ff6b6b; margin-top:14px; font-size:14px;">⚠️ {{ error }}</p>
+  {% endif %}
+
   <p class="bottom-text">
     New here? <a href="/register">Register</a>
   </p>
